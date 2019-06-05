@@ -241,6 +241,15 @@ function getDateIgnore(date, ignore) {
 	return new Date(...dateArray)
 }
 
+function formatTime (time) {
+	let ret = []
+	for(let i = 1; i < arguments.length; i++) {
+		ret.push(Math.trunc(time / arguments[i]))
+		time = time % arguments[i]
+	}
+	return ret
+}
+
 module.exports = {
 	PERIODS,
 	scape,
@@ -248,5 +257,6 @@ module.exports = {
 	dateToStr,
 	plus,
 	dateEquals,
-	getDateIgnore
+	getDateIgnore,
+	formatTime
 }
