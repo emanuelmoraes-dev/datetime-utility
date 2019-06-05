@@ -1,0 +1,23 @@
+{
+  "name": "datetime-utility",
+  "version": "1.0.0",
+  "description": "Simple tools for date manipulation in Javascript",
+  "readmeFilename": "README.md",
+  "keywords": [
+    "date",
+    "datetime",
+    "utility",
+    "tools"
+  ],
+  "main": "index.js",
+  "repository": "https://github.com/emanuelmoraes-dev/datetime-utility",
+  "author": {
+    "name": "Emanuel Moraes",
+    "email": "emanuelmoraes297@gmail.com"
+  },
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "is-iso-date": "^0.0.1"
+  }
+}
