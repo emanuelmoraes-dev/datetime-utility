@@ -21,7 +21,7 @@ function scape (str) {
 function toDate (str, pattern='dd/MM/yyyy hh:mm:ss:ll') {
   str = str.trim()
 
-  let expPattern = /yyyy|MM|M|dd|d|hh|h|mm|m|ss|s|l/g
+  let expPattern = /yyyy|y|MM|M|dd|d|hh|h|mm|m|ss|s|l/g
   let seps = pattern.split(expPattern)
 
   let sepsScape = seps.filter(s => s).map(scape)
@@ -47,8 +47,8 @@ function toDate (str, pattern='dd/MM/yyyy hh:mm:ss:ll') {
     if (i >= values.length)
       break
 
-    let v = values[i]
-    v = parseInt(v)
+    let value = values[i]
+    v = parseInt(value)
 
     if (Number.isNaN(v)) {
       valid = false
@@ -57,48 +57,52 @@ function toDate (str, pattern='dd/MM/yyyy hh:mm:ss:ll') {
 
     switch (m) {
         case 'dd': {
-            if (`${v}`.length !== 2) return null;
+          if (value.length !== 2) return null
         }
         case 'd': {
-            dateValues.day = v
-            break
+          dateValues.day = v
+          break
         }
         case 'MM': {
-            if (`${v}`.length !== 2) return null;
+          if (value.length !== 2) return null
         }
         case 'M': {
-            dateValues.month = v
-            break
+          dateValues.month = v
+          break
         }
         case 'yyyy': {
-            dateValues.year = v
-            break
+          if (value.length !== 4) return null
+        }
+        case 'y': {
+          dateValues.year = v
+          break
         }
         case 'hh': {
-            if (`${v}`.length !== 2) return null;
+          if (value.length !== 2) return null
         }
         case 'h': {
-            dateValues.hour = v
-            break
+          dateValues.hour = v
+          break
         }
         case 'mm': {
-            if (`${v}`.length !== 2) return null;
+          if (value.length !== 2) return null
         }
         case 'm': {
-            dateValues.minute = v
-            break
+          dateValues.minute = v
+          break
         }
         case 'ss': {
-            if (`${v}`.length !== 2) return null;
+          if (value.length !== 2) return null
         }
         case 's': {
-            dateValues.second = v
-            break
+          dateValues.second = v
+          break
         }
         case 'l': {
-            dateValues.millisecond = v
-            break
+          dateValues.millisecond = v
+          break
         }
+        default: throw new Error(`Pattern ${pattern} Inválid in '${m}'`)
     } 
   }
 
@@ -129,6 +133,8 @@ function dateToStr (valor, pattern = 'dd/MM/yyyy') {
 
     let values = {
       yyyy: ano,
+      yy: ano.substring(2),
+      y: ano,
       MM: mes.length === 1 ? `0${mes}` : mes,
       M: mes,
       dd: dia.length === 1 ? `0${dia}` : dia,
@@ -143,7 +149,7 @@ function dateToStr (valor, pattern = 'dd/MM/yyyy') {
       '': ''
     }
 
-    let expPattern = /yyyy|MM|M|dd|d|hh|h|mm|m|ss|s|l/g
+    let expPattern = /yyyy|yy|y|MM|M|dd|d|hh|h|mm|m|ss|s|l/g
     let seps = pattern.split(expPattern)
 
     let sepsScape = seps.filter(s => s).map(scape)
