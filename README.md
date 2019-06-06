@@ -2,6 +2,10 @@
 
 Simple tools for date manipulation in Javascript
 
+## Attention!
+
+This lib must be run in a modern browser or on a Node with a version 8.0.0 or higher
+
 ## Install
 
 ```sh
@@ -378,7 +382,7 @@ formatTime(
     200000,
     PERIODS.MINUTE, 
     PERIODS.SECOND
-) // [<quantidade de minutos em 200000 milissegundos>, <quantidade de segundos em 200000 milissegundos>]
+) // [<amount of minutes in 200000 milliseconds>, <number of seconds remaining>]
 ```
 
 #### Attention!
