@@ -1,6 +1,6 @@
 {
   "name": "datetime-utility",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Simple tools for date manipulation in Javascript",
   "readmeFilename": "README.md",
   "keywords": [
