@@ -318,7 +318,7 @@ getDateIgnore(
 getDateIgnore(
     // default pattern: 'yyyy/MM/dd hh:mm:ss:l'
     toDate('2019/06/10 10:30'),
-    0
+    7
 ) // gets exactly the same date
 ```
 
@@ -362,7 +362,7 @@ getDateIgnoreReverse(
 getDateIgnoreReverse(
     // default pattern: 'yyyy/MM/dd hh:mm:ss:l'
     toDate('2019/06/10 10:30'),
-    0
+    7
 ) // gets exactly the same date
 ```
 
