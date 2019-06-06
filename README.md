@@ -375,9 +375,10 @@ Gets values from a time
 
 ```js
 formatTime(
-    toDate('2019/06/10 10:30').getTime(),
-    PERIODS.MONTH, PERIODS.HOUR, PERIODS.MILLISECOND
-) // [6, 10, 0]
+    200000,
+    PERIODS.MINUTE, 
+    PERIODS.SECOND
+) // [<quantidade de minutos em 200000 milissegundos>, <quantidade de segundos em 200000 milissegundos>]
 ```
 
 #### Attention!
