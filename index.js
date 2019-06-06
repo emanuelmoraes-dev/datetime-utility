@@ -1,24 +1,24 @@
 const isISODate = require('is-iso-date')
 
 const PERIODS = {
-	MILISSEGUNDO: 'milissegundo',
-	SECOND: 'segundo',
-	MINUTE: 'minuto',
-	HOUR: 'hora',
-	DAY: 'dia',
-	WEEK: 'semana',
-	MONTH: 'mes',
-	TWO_MONTHS: 'bimestre',
-	SEMESTER: 'semestre',
-	QUARTER: 'trimestre',
-	YEAR: 'ano'
+	MILLISECOND: 1,
+	SECOND: 1000,
+	MINUTE: 60*1000,
+	HOUR: 60*60*1000,
+	DAY: 24*60*60*1000,
+	WEEK: 7*24*60*60*1000,
+	MONTH: 'month',
+	TWO_MONTHS: 'two_months',
+	SEMESTER: 'semester',
+	QUARTER: 'quarter',
+	YEAR: 'year'
 }
 
 function scape(str) {
 	return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
-function toDate(str, pattern = 'dd/MM/yyyy hh:mm:ss:ll') {
+function toDate(str, pattern = 'yyyy/MM/dd hh:mm:ss:l') {
 	str = str.trim()
 
 	let expPattern = /yyyy|y|MM|M|dd|d|hh|h|mm|m|ss|s|l/g
@@ -118,34 +118,34 @@ function toDate(str, pattern = 'dd/MM/yyyy hh:mm:ss:ll') {
 	)
 }
 
-function dateToStr(valor, pattern = 'dd/MM/yyyy') {
+function dateToStr(date, pattern = 'yyyy/MM/dd') {
 	pattern = pattern.trim()
-	if (typeof (valor) === 'string' && isISODate(valor)) { valor = new Date(valor) }
+	if (typeof (date) === 'string' && isISODate(date)) { date = new Date(date) }
 
-	if (valor instanceof Date) {
-		let dia = `${valor.getDate()}`
-		let mes = `${valor.getMonth() + 1}`
-		let hora = `${valor.getHours()}`
-		let minuto = `${valor.getMinutes()}`
-		let segundo = `${valor.getSeconds()}`
-		let milissegundo = `${valor.getMilliseconds()}`
-		let ano = `${valor.getFullYear()}`
+	if (date instanceof Date) {
+		let day = `${date.getDate()}`
+		let month = `${date.getMonth() + 1}`
+		let hour = `${date.getHours()}`
+		let minute = `${date.getMinutes()}`
+		let second = `${date.getSeconds()}`
+		let millisecond = `${date.getMilliseconds()}`
+		let year = `${date.getFullYear()}`
 
 		let values = {
-			yyyy: ano,
-			yy: ano.substring(2),
-			y: ano,
-			MM: mes.length === 1 ? `0${mes}` : mes,
-			M: mes,
-			dd: dia.length === 1 ? `0${dia}` : dia,
-			d: dia,
-			hh: hora.length === 1 ? `0${hora}` : hora,
-			h: hora,
-			mm: minuto.length === 1 ? `0${minuto}` : minuto,
-			m: minuto,
-			ss: segundo.length === 1 ? `0${segundo}` : segundo,
-			s: segundo,
-			l: milissegundo,
+			yyyy: year,
+			yy: year.substring(2),
+			y: year,
+			MM: month.length === 1 ? `0${month}` : month,
+			M: month,
+			dd: day.length === 1 ? `0${day}` : day,
+			d: day,
+			hh: hour.length === 1 ? `0${hour}` : hour,
+			h: hour,
+			mm: minute.length === 1 ? `0${minute}` : minute,
+			m: minute,
+			ss: second.length === 1 ? `0${second}` : second,
+			s: second,
+			l: millisecond,
 			'': ''
 		}
 
@@ -155,18 +155,18 @@ function dateToStr(valor, pattern = 'dd/MM/yyyy') {
 		let sepsScape = seps.filter(s => s).map(scape)
 		let mask = pattern.split(new RegExp(sepsScape.join('|'), 'g')).filter(p => p)
 
-		return seps.reduce((anterior, atual, index) => {
+		return seps.reduce((previous, now, index) => {
 			let m = mask[index]
 			if (!m) m = ''
-			return `${anterior}${atual}${values[m]}`
+			return `${previous}${now}${values[m]}`
 		}, '')
 	}
 
-	return valor
+	return date
 }
 
 function plus(date, period, duration) {
-	let [dia, mes, ano, hora, minuto, segundo, milissegundo] = [
+	let [day, month, year, hour, minute, second, millisecond] = [
 		date.getDate(),
 		date.getMonth(),
 		date.getFullYear(),
@@ -177,17 +177,17 @@ function plus(date, period, duration) {
 	]
 
 	switch (period) {
-		case PERIODS.MILISSEGUNDO: return new Date(ano, mes, dia, hora, minuto, segundo, milissegundo + duration)
-		case PERIODS.SECOND: return new Date(ano, mes, dia, hora, minuto, segundo + duration, milissegundo)
-		case PERIODS.MINUTE: return new Date(ano, mes, dia, hora, minuto + duration, segundo, milissegundo)
-		case PERIODS.HOUR: return new Date(ano, mes, dia, hora + duration, minuto, segundo, milissegundo)
-		case PERIODS.DAY: return new Date(ano, mes, dia + duration, hora, minuto, segundo, milissegundo)
-		case PERIODS.WEEK: return new Date(ano, mes, dia + duration * 7, hora, minuto, segundo, milissegundo)
-		case PERIODS.MONTH: return new Date(ano, mes + duration, dia, hora, minuto, segundo, milissegundo)
-		case PERIODS.TWO_MONTHS: return new Date(ano, mes + duration * 2, dia, hora, minuto, segundo, milissegundo)
-		case PERIODS.SEMESTER: return new Date(ano, mes + duration * 6, dia, hora, minuto, segundo, milissegundo)
-		case PERIODS.QUARTER: return new Date(ano, mes + duration * 3, dia, hora, minuto, segundo, milissegundo)
-		case PERIODS.YEAR: return new Date(ano + duration, mes, dia, hora, minuto, segundo, milissegundo)
+		case PERIODS.MILLISECOND: return new Date(year, month, day, hour, minute, second, millisecond + duration)
+		case PERIODS.SECOND: return new Date(year, month, day, hour, minute, second + duration, millisecond)
+		case PERIODS.MINUTE: return new Date(year, month, day, hour, minute + duration, second, millisecond)
+		case PERIODS.HOUR: return new Date(year, month, day, hour + duration, minute, second, millisecond)
+		case PERIODS.DAY: return new Date(year, month, day + duration, hour, minute, second, millisecond)
+		case PERIODS.WEEK: return new Date(year, month, day + duration * 7, hour, minute, second, millisecond)
+		case PERIODS.MONTH: return new Date(year, month + duration, day, hour, minute, second, millisecond)
+		case PERIODS.TWO_MONTHS: return new Date(year, month + duration * 2, day, hour, minute, second, millisecond)
+		case PERIODS.SEMESTER: return new Date(year, month + duration * 6, day, hour, minute, second, millisecond)
+		case PERIODS.QUARTER: return new Date(year, month + duration * 3, day, hour, minute, second, millisecond)
+		case PERIODS.YEAR: return new Date(year + duration, month, day, hour, minute, second, millisecond)
 		default:
 			throw new Error(`Período ${period} inválido`)
 	}
@@ -214,10 +214,10 @@ function dateEquals(date1, date2, ignore) {
 		date2.getMilliseconds()
 	]
 
-	return values1.reduce((anterior, atual, index) => {
-		if ((ignore === 0 || ignore) && ignore >= 0 && index >= ignore) { return anterior }
-		if (!anterior) { return false }
-		if (atual !== values2[index]) { return false }
+	return values1.reduce((previous, now, index) => {
+		if ((ignore === 0 || ignore) && ignore >= 0 && index >= ignore) { return previous }
+		if (!previous) { return false }
+		if (now !== values2[index]) { return false }
 		return true
 	}, true)
 }
@@ -233,9 +233,57 @@ function getDateIgnore(date, ignore) {
 		date.getMilliseconds()
 	]
 
-	let dateArray = values.reduce((anterior, atual, index) => {
-		if ((ignore === 0 || ignore) && ignore >= 0 && index >= ignore) { return [...anterior, 0] }
-		return [...anterior, atual]
+	let dateArray = values.reduce((previous, now, index) => {
+		if ((ignore === 0 || ignore) && ignore >= 0 && index >= ignore) { return [...previous, 0] }
+		return [...previous, now]
+	}, [])
+
+	return new Date(...dateArray)
+}
+
+function dateEqualsReverse(date1, date2, ignore) {
+	let values1 = [
+		date1.getFullYear(),
+		date1.getMonth(),
+		date1.getDate(),
+		date1.getHours(),
+		date1.getMinutes(),
+		date1.getSeconds(),
+		date1.getMilliseconds()
+	]
+
+	let values2 = [
+		date2.getFullYear(),
+		date2.getMonth(),
+		date2.getDate(),
+		date2.getHours(),
+		date2.getMinutes(),
+		date2.getSeconds(),
+		date2.getMilliseconds()
+	]
+
+	return values1.reduce((previous, now, index) => {
+		if ((ignore === 0 || ignore) && ignore >= 0 && index < ignore) { return previous }
+		if (!previous) { return false }
+		if (now !== values2[index]) { return false }
+		return true
+	}, true)
+}
+
+function getDateIgnoreReverse(date, ignore) {
+	let values = [
+		date.getFullYear(),
+		date.getMonth(),
+		date.getDate(),
+		date.getHours(),
+		date.getMinutes(),
+		date.getSeconds(),
+		date.getMilliseconds()
+	]
+
+	let dateArray = values.reduce((previous, now, index) => {
+		if ((ignore === 0 || ignore) && ignore >= 0 && index < ignore) { return [...previous, 0] }
+		return [...previous, now]
 	}, [])
 
 	return new Date(...dateArray)
@@ -250,6 +298,18 @@ function formatTime (time) {
 	return ret
 }
 
+function dateInApointment(date, target, period, duration) {
+	let dateIt = date
+
+	while (dateIt.getTime() <= target.getTime()) {
+		if (dateEquals(dateIt, target))
+			return true
+		dateIt = plus(dateIt, period, duration)
+	}
+
+	return false
+}
+
 module.exports = {
 	PERIODS,
 	scape,
@@ -257,6 +317,9 @@ module.exports = {
 	dateToStr,
 	plus,
 	dateEquals,
+	dateEqualsReverse,
 	getDateIgnore,
-	formatTime
+	getDateIgnoreReverse,
+	formatTime,
+	dateInApointment
 }
