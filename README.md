@@ -28,20 +28,6 @@ npm install datetime-utility --save
 * QUARTER
 * YEAR
 
-### scape(str : String)
-
-Returns string with special regular expression characters with escape
-
-#### parameters
-
-* str: string to have its special RegExp characters with escape
-
-#### example
-
-```js
-scape('ab.*+?^${c}()|d[]\\ef') // ab\.\*\+\?\^\$\{c\}\(\)\|d\[\]\\ef
-```
-
 ### toDate(str : String, pattern : String)
 
 Returns a date based on a string with a given pattern
@@ -412,4 +398,18 @@ dateInApointment(
     PERIODS.SEMESTER,
     1
 ) // returns true because the date 2025/07/02 is included in a timeline for each semester from the date of 2000/01/02 
+```
+
+### scape(str : String)
+
+Returns string with special regular expression characters with escape
+
+#### parameters
+
+* str: string to have its special RegExp characters with escape
+
+#### example
+
+```js
+scape('ab.*+?^${c}()|d[]\\ef') // ab\.\*\+\?\^\$\{c\}\(\)\|d\[\]\\ef
 ```
