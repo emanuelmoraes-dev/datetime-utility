@@ -50,7 +50,7 @@ Returns a date based on a string with a given pattern
 
 * str: String to convert to date
 
-* pattern: String containing date mask (default value 'yyyy/MM/dd hh:mm:ss:ll')
+* pattern: String containing date mask (default value 'yyyy/MM/dd hh:mm:ss:l')
 
 Pattern | Description
 ------- | ------------------------------------------
