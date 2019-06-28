@@ -44,7 +44,7 @@ dd      | day of the month containing two characters
 d       | day of the month
 MM      | month of the year (minimum 1) containing two characters
 M       | month of the year
-yyyy    | full year
+yyyy    | full year containing four characters
 y       | full year
 hh      | hours of day with two characters
 h       | hours of day
@@ -80,7 +80,7 @@ dd      | day of the month containing two characters
 d       | day of the month
 MM      | month of the year (minimum 1) containing two characters
 M       | month of the year
-yyyy    | full year
+yyyy    | full year containing four characters
 yy      | year containing the last two digits
 y       | full year
 hh      | hours of day with two characters

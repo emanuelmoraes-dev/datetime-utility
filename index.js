@@ -132,7 +132,7 @@ function dateToStr(date, pattern = 'yyyy/MM/dd') {
 		let year = `${date.getFullYear()}`
 
 		let values = {
-			yyyy: year,
+			yyyy: year.length < 4 ? null:year,
 			yy: year.substring(2),
 			y: year,
 			MM: month.length === 1 ? `0${month}` : month,
@@ -156,9 +156,12 @@ function dateToStr(date, pattern = 'yyyy/MM/dd') {
 		let mask = pattern.split(new RegExp(sepsScape.join('|'), 'g')).filter(p => p)
 
 		return seps.reduce((previous, now, index) => {
+			if (previous === null) return null
 			let m = mask[index]
 			if (!m) m = ''
-			return `${previous}${now}${values[m]}`
+			let value = values[m]
+			if (value === null) return null
+			return `${previous}${now}${value}`
 		}, '')
 	}
 
