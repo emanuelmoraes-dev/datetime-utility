@@ -15,10 +15,13 @@ const PERIODS = {
 }
 
 function scape(str) {
+	if (str === null || str === undefined) return str
 	return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
 function toDate(str, pattern = 'yyyy/MM/dd hh:mm:ss:l') {
+	if (str === null || str === undefined) return str
+
 	str = str.trim()
 
 	let expPattern = /yyyy|y|MM|M|dd|d|hh|h|mm|m|ss|s|l/g
@@ -119,6 +122,9 @@ function toDate(str, pattern = 'yyyy/MM/dd hh:mm:ss:l') {
 }
 
 function dateToStr(date, pattern = 'yyyy/MM/dd') {
+	if (str === null || str === undefined) return str
+	if (pattern === null || pattern === undefined) return null
+
 	pattern = pattern.trim()
 	if (typeof (date) === 'string' && isISODate(date)) { date = new Date(date) }
 
@@ -169,6 +175,10 @@ function dateToStr(date, pattern = 'yyyy/MM/dd') {
 }
 
 function plus(date, period, duration) {
+	if (date === null || date === undefined) return date
+	if (period === null || period === undefined) return null
+	if (duration === null || duration === undefined) return null
+
 	let [day, month, year, hour, minute, second, millisecond] = [
 		date.getDate(),
 		date.getMonth(),
@@ -197,6 +207,9 @@ function plus(date, period, duration) {
 }
 
 function dateEquals(date1, date2, ignore) {
+	if (date1 === null || date1 === undefined) throw new Error('date1 is null or undefined')
+	if (date2 === null || date2 === undefined) throw new Error('date2 is null or undefined')
+
 	let values1 = [
 		date1.getFullYear(),
 		date1.getMonth(),
@@ -226,6 +239,8 @@ function dateEquals(date1, date2, ignore) {
 }
 
 function getDateIgnore(date, ignore) {
+	if (date === null || date === undefined) return null
+
 	let values = [
 		date.getFullYear(),
 		date.getMonth(),
@@ -245,6 +260,9 @@ function getDateIgnore(date, ignore) {
 }
 
 function dateEqualsReverse(date1, date2, ignore) {
+	if (date1 === null || date1 === undefined) throw new Error('date1 is null or undefined')
+	if (date2 === null || date2 === undefined) throw new Error('date2 is null or undefined')
+
 	let values1 = [
 		date1.getFullYear(),
 		date1.getMonth(),
@@ -274,6 +292,8 @@ function dateEqualsReverse(date1, date2, ignore) {
 }
 
 function getDateIgnoreReverse(date, ignore) {
+	if (date === null || date === undefined) return null
+	
 	let values = [
 		date.getFullYear(),
 		date.getMonth(),
@@ -293,6 +313,8 @@ function getDateIgnoreReverse(date, ignore) {
 }
 
 function formatTime (time) {
+	if (time === null || time === undefined) return null
+
 	let ret = []
 	for(let i = 1; i < arguments.length; i++) {
 		ret.push(Math.trunc(time / arguments[i]))
@@ -302,6 +324,11 @@ function formatTime (time) {
 }
 
 function dateInApointment(date, target, period, duration) {
+	if (date === null || date === undefined) throw new Error('date is null or undefined')
+	if (target === null || target === undefined) throw new Error('target is null or undefined')
+	if (period === null || period === undefined) throw new Error('period is null or undefined')
+	if (duration === null || duration === undefined) throw new Error('duration is null or undefined')
+
 	let dateIt = date
 
 	while (dateIt.getTime() <= target.getTime()) {
