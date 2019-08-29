@@ -33,7 +33,7 @@ function toDate(str, pattern = 'yyyy/MM/dd hh:mm:ss:l') {
 	let values = str.split(expSepsScape).filter(p => p)
 
 	let dateValues = {
-		day: 0,
+		day: 1,
 		month: 0,
 		year: 0,
 		hour: 0,
