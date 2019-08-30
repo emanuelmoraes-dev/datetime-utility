@@ -1,10 +1,6 @@
 # datetime-utility
 
-Simple tools for date manipulation in Javascript
-
-## Attention!
-
-This lib must be run in a modern browser or on a Node with a version 8.0.0 or higher
+Simple tools for date manipulation in Javascript or TypeScript
 
 ## Install
 
@@ -12,9 +8,7 @@ This lib must be run in a modern browser or on a Node with a version 8.0.0 or hi
 npm install datetime-utility --save
 ```
 
-## API
-
-### PERIODS
+## PERIODS
 
 * MILLISECOND
 * SECOND
@@ -28,11 +22,11 @@ npm install datetime-utility --save
 * QUARTER
 * YEAR
 
-### toDate(str : String, pattern : String)
+## toDate(str : String, pattern : String)
 
 Returns a date based on a string with a given pattern
 
-#### parameters
+### parameters
 
 * str: String to convert to date
 
@@ -55,22 +49,21 @@ s       | seconds of minute
 l       | millisecond of second
 
 
-#### examples
+### examples
 
 ```js
 toDate('10/06/2019 21:13', 'dd/MM/yyyy hh:mm') // returns Date
 toDate('10/6/2019 21:13', 'd/M/yyyy hh:mm') // returns Date
 toDate('10/6/2019 21:13', 'dd/MM/yyyy hh:mm') // returns null, month invalid
-
 ```
 
-### dateToStr(date : Date, pattern : String)
+## dateToStr(date : Date, pattern : String)
 
 Converts a date to a string in the format described in the pattern
 
-#### parameters
+### parameters
 
-* date: Date to convert to string
+* date: date (or string in ISO format) to convert to string
 
 * pattern: date format (default value: 'yyyy/MM/dd')
 
@@ -91,7 +84,7 @@ ss      | seconds of minute with two characters
 s       | seconds of minute
 l       | millisecond of second
 
-#### examples
+### examples
 
 ```js
 dateToStr(
@@ -110,19 +103,19 @@ dateToStr(
 ) // null
 ```
 
-### plus(date: String, period: String|Number, duration : Number)
+## plus(date: String, period: String|Number, duration : Number)
 
 Adds a value of a time period on a date
 
-#### parameters
+### parameters
 
-* date: date to be increased by a period of time
+* date: date (or string in ISO format) to be increased by a period of time
 
 * period: textual or numeric representation (stored in 'PERIODS') of a period of time to be added to the date
 
 * duration: unit of time to be added to the date
 
-#### examples
+### examples
 
 ```js
 plus(
@@ -138,15 +131,15 @@ plus(
 ) // date with one year more
 ```
 
-### dateEquals(date1 : Date, date2 : Date, ignore : Number)
+## dateEquals(date1 : Date, date2 : Date, ignore : Number)
 
 Returns true if both dates are equal, ignoring certain **lower** values
 
-#### parameters
+### parameters
 
-* date1: first date of comparison
+* date1: first date (or string in ISO format) of comparison
 
-* date2: second date of comparison
+* date2: second date (or string in ISO format) of comparison
 
 * ignore: position from which the **lowest** values will be ignored (if not informed, nothing is ignored.)
 
@@ -162,7 +155,7 @@ default | nothing ignored
 1       | millisecond, second, minute, hour, day and month
 0       | ignoring everything, that is, the dates are the same
 
-#### examples
+### examples
 
 ```js
 dateEquals(
@@ -201,15 +194,15 @@ dateEquals(
 ) // false
 ```
 
-### dateEqualsReverse(date1 : Date, date2 : Date, ignore : Number)
+## dateEqualsReverse(date1 : Date, date2 : Date, ignore : Number)
 
 Returns true if both dates are equal, ignoring certain **higher** values
 
-#### parameters
+### parameters
 
-* date1: first date of comparison
+* date1: first date (or string in ISO format) of comparison
 
-* date2: second date of comparison
+* date2: second date (or string in ISO format) of comparison
 
 * ignore: position from which the **highest** values will be ignored (if not informed, nothing will be ignored).
 
@@ -225,7 +218,7 @@ default | nothing ignored
 1       | year, month, day, hour, minute and second
 0       | ignoring everything, that is, the dates are the same
 
-#### examples
+### examples
 
 ```js
 dateEqualsReverse(
@@ -264,13 +257,13 @@ dateEqualsReverse(
 ) // false
 ```
 
-### getDateIgnore(date : Date, ignore : Number)
+## getDateIgnore(date : Date, ignore : Number)
 
 Gets date ignoring **lower** values
 
-#### parameters
+### parameters
 
-* date: date that will have higher values ignored
+* date: date (or string in ISO format) that will have higher values ignored
 
 * ignore: position from which the **lowest** values will be ignored (if not informed, nothing is ignored.)
 
@@ -286,7 +279,7 @@ default | nothing ignored
 1       | millisecond, second, minute, hour, day and month
 0       | ignoring everything
 
-#### examples
+### examples
 
 ```js
 getDateIgnore(
@@ -308,13 +301,13 @@ getDateIgnore(
 ) // gets exactly the same date
 ```
 
-### getDateIgnoreReverse(date : Date, ignore : Number)
+## getDateIgnoreReverse(date : Date, ignore : Number)
 
 Gets date ignoring **high** values
 
-#### parameters
+### parameters
 
-* date: date that will have higher values ignored
+* date: date (or string in ISO format) that will have higher values ignored
 
 * ignore: position from which the **highest** values will be ignored (if not informed, nothing will be ignored).
 
@@ -330,7 +323,7 @@ default | nothing ignored
 1       | year, month, day, hour, minute and second
 0       | ignoring everything, that is, the dates are the same
 
-#### examples
+### examples
 
 ```js
 getDateIgnoreReverse(
@@ -352,36 +345,36 @@ getDateIgnoreReverse(
 ) // gets exactly the same date
 ```
 
-### formatTime(time : Number, ...args : Number)
+## formatTime(time : Number, ...args : Number)
 
 Gets values from a time
 
-#### parameters
+### parameters
 
 * time: milliseconds obtained by the getTime() function
 * ...args: types of values to be extracted and placed in an array
 
-#### examples
+### examples
 
 ```js
 formatTime(
-    200000,
+    200100,
     PERIODS.MINUTE, 
     PERIODS.SECOND
-) // [<amount of minutes in 200000 milliseconds>, <number of seconds remaining>]
+) // [<amount of minutes in 200100 milliseconds>, <number of seconds remaining>]
 ```
 
-#### Attention!
+### Attention!
 
 The MONTH, TWO_MONTHS, SEMESTER, QUARTER, and YEAR variables can **not** be used in formatTime.
 
-### dateInApointment(date : Date, target : Date, period : String|Number, duration : Number)
+## dateInApointment(date : Date, target : Date, period : String|Number, duration : Number)
 
 Returns true if the date is present within a recurring schedule.
 
-#### parameters
+### parameters
 
-* date: first scheduling date
+* date: first scheduling date (or string in ISO format)
 
 * target: check to see if you are on scheduling.
 
@@ -389,7 +382,7 @@ Returns true if the date is present within a recurring schedule.
 
 * duration: unit to include new periodic dates in schedule
 
-#### examples
+### examples
 
 ```js
 dateInApointment(
@@ -397,18 +390,25 @@ dateInApointment(
     toDate('2025/07/02'),
     PERIODS.SEMESTER,
     1
-) // returns true because the date 2025/07/02 is included in a timeline for each semester from the date of 2000/01/02 
+) // returns true because the date 2025/07/02 is included in a timeline for each semester from the date of 2000/01/02
+
+dateInApointment(
+    toDate('2000/01/02'),
+    toDate('2025/07/02'),
+    PERIODS.SEMESTER,
+    2
+) // returns false because the date 2025/07/02 is not included in a timeline for each two semester from the date of 2000/01/02
 ```
 
-### scape(str : String)
+## scape(str : String)
 
 Returns string with special regular expression characters with escape
 
-#### parameters
+### parameters
 
 * str: string to have its special RegExp characters with escape
 
-#### example
+### example
 
 ```js
 scape('ab.*+?^${c}()|d[]\\ef') // ab\.\*\+\?\^\$\{c\}\(\)\|d\[\]\\ef
