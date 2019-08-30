@@ -57,7 +57,7 @@ toDate('10/6/2019 21:13', 'd/M/yyyy hh:mm') // returns Date
 toDate('10/6/2019 21:13', 'dd/MM/yyyy hh:mm') // returns null, month invalid
 ```
 
-## dateToStr(date : Date, pattern : String)
+## dateToStr(date : Date|String, pattern : String)
 
 Converts a date to a string in the format described in the pattern
 
@@ -103,7 +103,7 @@ dateToStr(
 ) // null
 ```
 
-## plus(date: String, period: String|Number, duration : Number)
+## plus(date: Date|String, period: String|Number, duration : Number)
 
 Adds a value of a time period on a date
 
@@ -131,7 +131,7 @@ plus(
 ) // date with one year more
 ```
 
-## dateEquals(date1 : Date, date2 : Date, ignore : Number)
+## dateEquals(date1 : Date|String, date2 : Date|String, ignore : Number)
 
 Returns true if both dates are equal, ignoring certain **lower** values
 
@@ -194,7 +194,7 @@ dateEquals(
 ) // false
 ```
 
-## dateEqualsReverse(date1 : Date, date2 : Date, ignore : Number)
+## dateEqualsReverse(date1 : Date|String, date2 : Date|String, ignore : Number)
 
 Returns true if both dates are equal, ignoring certain **higher** values
 
@@ -257,7 +257,7 @@ dateEqualsReverse(
 ) // false
 ```
 
-## getDateIgnore(date : Date, ignore : Number)
+## getDateIgnore(date : Date|String, ignore : Number)
 
 Gets date ignoring **lower** values
 
@@ -301,7 +301,7 @@ getDateIgnore(
 ) // gets exactly the same date
 ```
 
-## getDateIgnoreReverse(date : Date, ignore : Number)
+## getDateIgnoreReverse(date : Date|String, ignore : Number)
 
 Gets date ignoring **high** values
 
@@ -368,7 +368,7 @@ formatTime(
 
 The MONTH, TWO_MONTHS, SEMESTER, QUARTER, and YEAR variables can **not** be used in formatTime.
 
-## dateInApointment(date : Date, target : Date, period : String|Number, duration : Number)
+## dateInApointment(date : Date | String, target : Date|String, period : String|Number, duration : Number)
 
 Returns true if the date is present within a recurring schedule.
 
