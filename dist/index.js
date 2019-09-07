@@ -17,14 +17,14 @@ exports.PERIODS = {
     WEEK: 7 * 24 * 60 * 60 * 1000,
     MONTH: 'month',
     TWO_MONTHS: 'two_months',
-    SEMESTER: 'semester',
     QUARTER: 'quarter',
+    SEMESTER: 'semester',
     YEAR: 'year'
 };
 /**
  * Returns a date based on a string with a given pattern
  * @param {string} str - String to convert to date
- * @param {string} pattern - String containing date mask (default value 'yyyy/MM/dd hh:mm:ss:l')
+ * @param {string=} pattern - String containing date mask (default value 'yyyy/MM/dd hh:mm:ss.l')
  * @returns {Date}
  *
  * | Pattern | Description                                             |
@@ -49,7 +49,7 @@ exports.PERIODS = {
  * toDate('10/6/2019 21:13', 'dd/MM/yyyy hh:mm') // returns null, month invalid
  */
 function toDate(str, pattern) {
-    if (pattern === void 0) { pattern = 'yyyy/MM/dd hh:mm:ss:l'; }
+    if (pattern === void 0) { pattern = 'yyyy/MM/dd hh:mm:ss.l'; }
     if (str === null || str === undefined)
         return null;
     if (pattern === null || pattern === undefined)
@@ -145,7 +145,7 @@ exports.toDate = toDate;
 /**
  * Converts a date to a string in the format described in the pattern
  * @param {Date|string} date - Date (or string in ISO format) to convert to string
- * @param {string} pattern - date format (default value: 'yyyy/MM/dd')
+ * @param {string=} pattern - date format (default value: 'yyyy/MM/dd')
  * @returns {string}
  *
  * | Pattern | Description                                             |
@@ -237,6 +237,67 @@ function dateToStr(date, pattern) {
 }
 exports.dateToStr = dateToStr;
 /**
+ * Returns the minimum pattern  (strictly necessary) of a given formatted string representing a date
+ * @param {string} strDate - date in string format
+ * @param {string} pattern - 'strDate' parameter date format
+ * @returns {string}
+ *
+ * | Pattern | Description                                             |
+ * | ------- | ------------------------------------------------------- |
+ * | dd      | day of the month containing two characters              |
+ * | d       | day of the month                                        |
+ * | MM      | month of the year (minimum 1) containing two characters |
+ * | M       | month of the year                                       |
+ * | yyyy    | full year containing four characters                    |
+ * | yy      | year containing the last two digits                     |
+ * | y       | full year                                               |
+ * | hh      | hours of day with two characters                        |
+ * | h       | hours of day                                            |
+ * | mm      | minutes of hour with two characters                     |
+ * | m       | minutes of hour                                         |
+ * | ss      | seconds of minute with two characters                   |
+ * | s       | seconds of minute                                       |
+ * | l       | millisecond of second                                   |
+ *
+ * @example
+ * let date = toDate('10/06/2019 21:13', 'dd/MM/yyyy hh:mm:ss.l')
+ * let minPattern = getMinPattern('10/06/2019 21:13', 'dd/MM/yyyy hh:mm:ss.l') // dd/MM/yyyy hh:mm
+ * date = plus(date, PERIODS.YEAR, 1)
+ * dateToStr(date, minPattern) // 10/06/2020 21:13
+ *
+ * date = toDate('10/06/2019 21:13:00.000', 'dd/MM/yyyy hh:mm')
+ * minPattern = getMinPattern('10/06/2019 21:13:00.000', 'dd/MM/yyyy hh:mm') // dd/MM/yyyy hh:mm
+ * date = plus(date, PERIODS.YEAR, 1)
+ * dateToStr(date, minPattern) // 10/06/2020 21:13
+ *
+ * getMinPattern(
+ *     null,
+ *     'dd/MM/yyyy hh:mm:ss.l'
+ * ) // null
+ */
+function getMinPattern(strDate, pattern) {
+    if (strDate === null || strDate === undefined)
+        return null;
+    if (pattern === null || pattern === undefined)
+        return null;
+    if (!strDate.trim())
+        return null;
+    var expPattern = /yyyy|y|MM|M|dd|d|hh|h|mm|m|ss|s|l/g;
+    var seps = pattern.split(expPattern);
+    var sepsScape = seps.filter(function (s) { return s; }).map(scape);
+    var expSepsScape = new RegExp(sepsScape.join('|'), 'g');
+    var mask = pattern.split(expSepsScape).filter(function (p) { return p; });
+    var values = strDate.split(expSepsScape).filter(function (p) { return p; });
+    return values.reduce(function (minPattern, _, index) {
+        if (index >= mask.length)
+            return minPattern;
+        var m = mask[index];
+        var s = index < seps.length ? seps[index] : '';
+        return "" + minPattern + s + m;
+    }, '');
+}
+exports.getMinPattern = getMinPattern;
+/**
  * Adds a value of a time period on a date
  * @param {Date|string} date - date (or string in ISO format) to be increased by a period of time
  * @param {string|number} period - textual or numeric representation (stored in 'PERIODS') of a period of time to be added to the date
@@ -320,14 +381,14 @@ exports.plus = plus;
  * ) // true
  *
  * dateEquals(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss:l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
  *     toDate('2019/06/10 10:30'),
  *     toDate('2019/06/10 02:13')
  * ) // false
  *
  * // ignoring millisecond, second, minute, hour and day
  * dateEquals(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss:l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
  *     toDate('2019/06/10 10:30'),
  *     toDate('2019/06/10 02:13'),
  *     2
@@ -335,7 +396,7 @@ exports.plus = plus;
  *
  * // ignoring millisecond, second, minute and hour
  * dateEquals(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss:l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
  *     toDate('2019/06/10 10:30'),
  *     toDate('2019/06/10 02:13'),
  *     3
@@ -343,7 +404,7 @@ exports.plus = plus;
  *
  * // ignoring millisecond, second and minute
  * dateEquals(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss:l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
  *     toDate('2019/06/10 10:30'),
  *     toDate('2019/06/10 02:13'),
  *     4
@@ -418,7 +479,7 @@ exports.dateEquals = dateEquals;
  *
  * @example
  * dateEqualsReverse(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss:l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
  *     toDate('2019/10/06 10:40'),
  *     toDate('2019/10/06 10:40')
  * ) // true
@@ -430,7 +491,7 @@ exports.dateEquals = dateEquals;
  *
  * // ignoring year, month and day
  * dateEqualsReverse(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss:l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
  *     toDate('2019/10/06 10:40'),
  *     toDate('2019/12/06 10:40'),
  *     4
@@ -438,7 +499,7 @@ exports.dateEquals = dateEquals;
  *
  * // ignoring year and month
  * dateEqualsReverse(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss:l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
  *     toDate('2019/10/06 10:40'),
  *     toDate('2019/12/06 10:40'),
  *     5
@@ -446,7 +507,7 @@ exports.dateEquals = dateEquals;
  *
  * // ignoring year
  * dateEqualsReverse(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss:l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
  *     toDate('2019/10/06 10:40'),
  *     toDate('2019/12/06 10:40'),
  *     6
@@ -522,19 +583,19 @@ exports.dateEqualsReverse = dateEqualsReverse;
  *
  * @example
  * getDateIgnore(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss:l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
  *     toDate('2019/06/10 10:30'),
  *     3
  * ) // Date only with year, month and day
  *
  * getDateIgnore(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss:l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
  *     toDate('2019/06/10 10:30'),
  *     4
  * ) // Date only with year, month, day and hour
  *
  * getDateIgnore(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss:l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
  *     toDate('2019/06/10 10:30'),
  *     7
  * ) // gets exactly the same date
@@ -558,11 +619,8 @@ function getDateIgnore(date, ignore) {
         date.getMilliseconds()
     ];
     var dateArray = values.reduce(function (previous, now, index) {
-        var d = 0;
-        if (index === 2) // day
-            d = 1;
         if ((ignore === 0 || ignore) && ignore >= 0 && index >= ignore) {
-            return __spreadArrays(previous, [d]);
+            return __spreadArrays(previous, [0]);
         }
         return __spreadArrays(previous, [now]);
     }, []);
@@ -589,19 +647,19 @@ exports.getDateIgnore = getDateIgnore;
  *
  * @example
  * getDateIgnoreReverse(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss:l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
  *     toDate('2019/06/10 10:30'),
  *     4
  * ) // Date only with hour, minute, second and millisecond
  *
  * getDateIgnoreReverse(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss:l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
  *     toDate('2019/06/10 10:30'),
  *     5
  * ) // Date only with day, hour, minute, second and millisecond
  *
  * getDateIgnoreReverse(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss:l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
  *     toDate('2019/06/10 10:30'),
  *     7
  * ) // gets exactly the same date
@@ -626,11 +684,8 @@ function getDateIgnoreReverse(date, ignore) {
     ];
     values = values.reverse();
     var dateArray = values.reduce(function (previous, now, index) {
-        var d = 0;
-        if (index === 4) // day
-            d = 1;
         if ((ignore === 0 || ignore) && ignore >= 0 && index >= ignore) {
-            return __spreadArrays(previous, [d]);
+            return __spreadArrays(previous, [0]);
         }
         return __spreadArrays(previous, [now]);
     }, []);

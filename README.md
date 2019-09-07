@@ -137,6 +137,11 @@ let minPattern = getMinPattern('10/06/2019 21:13', 'dd/MM/yyyy hh:mm:ss.l') // d
 date = plus(date, PERIODS.YEAR, 1)
 dateToStr(date, minPattern) // 10/06/2020 21:13
 
+date = toDate('10/06/2019 21:13:00.000', 'dd/MM/yyyy hh:mm')
+minPattern = getMinPattern('10/06/2019 21:13:00.000', 'dd/MM/yyyy hh:mm') // dd/MM/yyyy hh:mm
+date = plus(date, PERIODS.YEAR, 1)
+dateToStr(date, minPattern) // 10/06/2020 21:13
+
 getMinPattern(
     null,
     'dd/MM/yyyy hh:mm:ss.l'

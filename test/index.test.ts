@@ -99,6 +99,21 @@ test("getMinPattern(null, 'dd/MM/yyyy hh:mm:ss.l')", async () => {
     )
 })
 
+test("getMinPattern('10/06/2019 21:13:00.000', 'dd/MM/yyyy hh:mm')", async () => {
+    let date = toDate('10/06/2019 21:13:00.000', 'dd/MM/yyyy hh:mm')
+
+    let minPattern = getMinPattern('10/06/2019 21:13:00.000', 'dd/MM/yyyy hh:mm')
+    expect(minPattern).toBe('dd/MM/yyyy hh:mm')
+
+    date = plus(date, PERIODS.YEAR, 1)
+    
+    expect(
+        dateToStr(date, minPattern)
+    ).toBe(
+        '10/06/2020 21:13'
+    )
+})
+
 test("plus(toDate('10/06/2019 21:13', 'dd/MM/yyyy hh:mm'), PERIODS.DAY, -1)", async () => {
     expect(
         plus(

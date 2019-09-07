@@ -264,6 +264,11 @@ export function dateToStr(date: Date|string, pattern: string = 'yyyy/MM/dd'): st
  * date = plus(date, PERIODS.YEAR, 1)
  * dateToStr(date, minPattern) // 10/06/2020 21:13
  * 
+ * date = toDate('10/06/2019 21:13:00.000', 'dd/MM/yyyy hh:mm')
+ * minPattern = getMinPattern('10/06/2019 21:13:00.000', 'dd/MM/yyyy hh:mm') // dd/MM/yyyy hh:mm
+ * date = plus(date, PERIODS.YEAR, 1)
+ * dateToStr(date, minPattern) // 10/06/2020 21:13
+ * 
  * getMinPattern(
  *     null,
  *     'dd/MM/yyyy hh:mm:ss.l'
@@ -283,6 +288,7 @@ export function getMinPattern(strDate: string, pattern: string): string {
 	let values = strDate.split(expSepsScape).filter(p => p)
 
 	return values.reduce((minPattern: string, _, index: number) => {
+		if (index >= mask.length) return minPattern
 		let m = mask[index]
 		let s = index < seps.length ? seps[index] : ''
 		return `${minPattern}${s}${m}`
