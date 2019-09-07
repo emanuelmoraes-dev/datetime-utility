@@ -1,4 +1,4 @@
-import { toDate, dateToStr, plus, PERIODS, dateEquals, dateEqualsReverse, getDateIgnore, getDateIgnoreReverse, formatTime, dateInApointment, scape } from '../src'
+import { toDate, dateToStr, plus, PERIODS, dateEquals, dateEqualsReverse, getDateIgnore, getDateIgnoreReverse, formatTime, dateInApointment, scape, getMinPattern } from '../src'
 
 test("toDate('')", async () => {
     expect(
@@ -67,6 +67,32 @@ test("dateToStr(null, 'dd/MM/yyyy hh:mm')", async () => {
         dateToStr(
             null,
             'dd/MM/yyyy hh:mm'
+        )
+    ).toBe(
+        null
+    )
+})
+
+test("getMinPattern('10/06/2019 21:13', 'dd/MM/yyyy hh:mm:ss.l')", async () => {
+    let date = toDate('10/06/2019 21:13', 'dd/MM/yyyy hh:mm:ss.l')
+
+    let minPattern = getMinPattern('10/06/2019 21:13', 'dd/MM/yyyy hh:mm:ss.l')
+    expect(minPattern).toBe('dd/MM/yyyy hh:mm')
+
+    date = plus(date, PERIODS.YEAR, 1)
+    
+    expect(
+        dateToStr(date, minPattern)
+    ).toBe(
+        '10/06/2020 21:13'
+    )
+})
+
+test("getMinPattern(null, 'dd/MM/yyyy hh:mm:ss.l')", async () => {
+    expect(
+        getMinPattern(
+            null,
+            'dd/MM/yyyy hh:mm:ss.l'
         )
     ).toBe(
         null
@@ -156,7 +182,7 @@ test("dateEquals(toDate('2019/06/10 10:30'), toDate('2019/06/10 02:13'), 4)", as
 test("dateEqualsReverse(toDate('2019/10/06 10:40'),  toDate('2019/10/06 10:40'))", async () => {
     expect(
         dateEqualsReverse(
-            // default pattern: 'yyyy/MM/dd hh:mm:ss:l'
+            // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
             toDate('2019/10/06 10:40'), 
             toDate('2019/10/06 10:40')
         )
@@ -168,7 +194,7 @@ test("dateEqualsReverse(toDate('2019/10/06 10:40'),  toDate('2019/10/06 10:40'))
 test("dateEqualsReverse(toDate('2019/10/06 10:40'),  toDate('2019/12/06 10:40'))", async () => {
     expect(
         dateEqualsReverse(
-            // default pattern: 'yyyy/MM/dd hh:mm:ss:l'
+            // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
             toDate('2019/10/06 10:40'), 
             toDate('2019/12/06 10:40')
         )
@@ -180,7 +206,7 @@ test("dateEqualsReverse(toDate('2019/10/06 10:40'),  toDate('2019/12/06 10:40'))
 test("dateEqualsReverse(toDate('2019/10/06 10:40'),  toDate('2019/12/06 10:40'), 4)", async () => {
     expect(
         dateEqualsReverse(
-            // default pattern: 'yyyy/MM/dd hh:mm:ss:l'
+            // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
             toDate('2019/10/06 10:40'), 
             toDate('2019/12/06 10:40'),
             4
@@ -193,7 +219,7 @@ test("dateEqualsReverse(toDate('2019/10/06 10:40'),  toDate('2019/12/06 10:40'),
 test("dateEqualsReverse(toDate('2019/10/06 10:40'),  toDate('2019/12/06 10:40'), 5)", async () => {
     expect(
         dateEqualsReverse(
-            // default pattern: 'yyyy/MM/dd hh:mm:ss:l'
+            // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
             toDate('2019/10/06 10:40'), 
             toDate('2019/12/06 10:40'),
             5
@@ -206,7 +232,7 @@ test("dateEqualsReverse(toDate('2019/10/06 10:40'),  toDate('2019/12/06 10:40'),
 test("dateEqualsReverse(toDate('2019/10/06 10:40'),  toDate('2019/12/06 10:40'), 6)", async () => {
     expect(
         dateEqualsReverse(
-            // default pattern: 'yyyy/MM/dd hh:mm:ss:l'
+            // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
             toDate('2019/10/06 10:40'), 
             toDate('2019/12/06 10:40'),
             6
@@ -219,7 +245,7 @@ test("dateEqualsReverse(toDate('2019/10/06 10:40'),  toDate('2019/12/06 10:40'),
 test("getDateIgnore(toDate('2019/06/10 10:30'), 3)", async () => {
     expect(
         getDateIgnore(
-            // default pattern: 'yyyy/MM/dd hh:mm:ss:l'
+            // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
             toDate('2019/06/10 10:30'),
             3
         ).toISOString()
@@ -231,7 +257,7 @@ test("getDateIgnore(toDate('2019/06/10 10:30'), 3)", async () => {
 test("getDateIgnore(toDate('2019/06/10 10:30'), 3)", async () => {
     expect(
         getDateIgnore(
-            // default pattern: 'yyyy/MM/dd hh:mm:ss:l'
+            // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
             toDate('2019/06/10 10:30'),
             4
         ).toISOString()
@@ -243,7 +269,7 @@ test("getDateIgnore(toDate('2019/06/10 10:30'), 3)", async () => {
 test("getDateIgnore(toDate('2019/06/10 10:30'), 3)", async () => {
     expect(
         getDateIgnore(
-            // default pattern: 'yyyy/MM/dd hh:mm:ss:l'
+            // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
             toDate('2019/06/10 10:30'),
             7
         ).toISOString()
@@ -255,7 +281,7 @@ test("getDateIgnore(toDate('2019/06/10 10:30'), 3)", async () => {
 test("getDateIgnoreReverse(toDate('2019/06/10 10:30'), 4)", async () => {
     expect(
         getDateIgnoreReverse(
-            // default pattern: 'yyyy/MM/dd hh:mm:ss:l'
+            // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
             toDate('2019/06/10 10:30'),
             4
         ).toISOString()
@@ -267,7 +293,7 @@ test("getDateIgnoreReverse(toDate('2019/06/10 10:30'), 4)", async () => {
 test("getDateIgnoreReverse(toDate('2019/06/10 10:30'), 5)", async () => {
     expect(
         getDateIgnoreReverse(
-            // default pattern: 'yyyy/MM/dd hh:mm:ss:l'
+            // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
             toDate('2019/06/10 10:30'),
             5
         ).toISOString()
@@ -279,7 +305,7 @@ test("getDateIgnoreReverse(toDate('2019/06/10 10:30'), 5)", async () => {
 test("getDateIgnoreReverse(toDate('2019/06/10 10:30'), 7)", async () => {
     expect(
         getDateIgnoreReverse(
-            // default pattern: 'yyyy/MM/dd hh:mm:ss:l'
+            // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
             toDate('2019/06/10 10:30'),
             7
         ).toISOString()

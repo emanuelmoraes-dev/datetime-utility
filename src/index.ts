@@ -9,15 +9,15 @@ export const PERIODS = {
 	WEEK: 7*24*60*60*1000,
 	MONTH: 'month',
 	TWO_MONTHS: 'two_months',
-	SEMESTER: 'semester',
 	QUARTER: 'quarter',
+	SEMESTER: 'semester',
 	YEAR: 'year'
 }
 
 /**
  * Returns a date based on a string with a given pattern
  * @param {string} str - String to convert to date
- * @param {string} pattern - String containing date mask (default value 'yyyy/MM/dd hh:mm:ss:l')
+ * @param {string=} pattern - String containing date mask (default value 'yyyy/MM/dd hh:mm:ss.l')
  * @returns {Date}
  * 
  * | Pattern | Description                                             |
@@ -41,7 +41,7 @@ export const PERIODS = {
  * toDate('10/6/2019 21:13', 'd/M/yyyy hh:mm') // returns Date
  * toDate('10/6/2019 21:13', 'dd/MM/yyyy hh:mm') // returns null, month invalid
  */
-export function toDate(str: string, pattern: string = 'yyyy/MM/dd hh:mm:ss:l'): Date {
+export function toDate(str: string, pattern: string = 'yyyy/MM/dd hh:mm:ss.l'): Date {
 	if (str === null || str === undefined) return null
 	if (pattern === null || pattern === undefined) return null
 	if (!str.trim()) return null
@@ -146,7 +146,7 @@ export function toDate(str: string, pattern: string = 'yyyy/MM/dd hh:mm:ss:l'): 
 /**
  * Converts a date to a string in the format described in the pattern
  * @param {Date|string} date - Date (or string in ISO format) to convert to string
- * @param {string} pattern - date format (default value: 'yyyy/MM/dd')
+ * @param {string=} pattern - date format (default value: 'yyyy/MM/dd')
  * @returns {string}
  * 
  * | Pattern | Description                                             |
@@ -236,6 +236,60 @@ export function dateToStr(date: Date|string, pattern: string = 'yyyy/MM/dd'): st
 }
 
 /**
+ * Returns the minimum pattern  (strictly necessary) of a given formatted string representing a date
+ * @param {string} strDate - date in string format
+ * @param {string} pattern - 'strDate' parameter date format
+ * @returns {string}
+ * 
+ * | Pattern | Description                                             |
+ * | ------- | ------------------------------------------------------- |
+ * | dd      | day of the month containing two characters              |
+ * | d       | day of the month                                        |
+ * | MM      | month of the year (minimum 1) containing two characters |
+ * | M       | month of the year                                       |
+ * | yyyy    | full year containing four characters                    |
+ * | yy      | year containing the last two digits                     |
+ * | y       | full year                                               |
+ * | hh      | hours of day with two characters                        |
+ * | h       | hours of day                                            |
+ * | mm      | minutes of hour with two characters                     |
+ * | m       | minutes of hour                                         |
+ * | ss      | seconds of minute with two characters                   |
+ * | s       | seconds of minute                                       |
+ * | l       | millisecond of second                                   |
+ * 
+ * @example
+ * let date = toDate('10/06/2019 21:13', 'dd/MM/yyyy hh:mm:ss.l')
+ * let minPattern = getMinPattern('10/06/2019 21:13', 'dd/MM/yyyy hh:mm:ss.l') // dd/MM/yyyy hh:mm
+ * date = plus(date, PERIODS.YEAR, 1)
+ * dateToStr(date, minPattern) // 10/06/2020 21:13
+ * 
+ * getMinPattern(
+ *     null,
+ *     'dd/MM/yyyy hh:mm:ss.l'
+ * ) // null
+ */
+export function getMinPattern(strDate: string, pattern: string): string {
+	if (strDate === null || strDate === undefined) return null
+	if (pattern === null || pattern === undefined) return null
+	if (!strDate.trim()) return null
+
+	let expPattern = /yyyy|y|MM|M|dd|d|hh|h|mm|m|ss|s|l/g
+	let seps = pattern.split(expPattern)
+
+	let sepsScape = seps.filter(s => s).map(scape)
+	let expSepsScape = new RegExp(sepsScape.join('|'), 'g')
+	let mask = pattern.split(expSepsScape).filter(p => p)
+	let values = strDate.split(expSepsScape).filter(p => p)
+
+	return values.reduce((minPattern: string, _, index: number) => {
+		let m = mask[index]
+		let s = index < seps.length ? seps[index] : ''
+		return `${minPattern}${s}${m}`
+	}, '')
+}
+
+/**
  * Adds a value of a time period on a date
  * @param {Date|string} date - date (or string in ISO format) to be increased by a period of time
  * @param {string|number} period - textual or numeric representation (stored in 'PERIODS') of a period of time to be added to the date
@@ -316,14 +370,14 @@ export function plus(date: Date|string, period: string|number, duration: number)
  * ) // true
  * 
  * dateEquals(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss:l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
  *     toDate('2019/06/10 10:30'),
  *     toDate('2019/06/10 02:13')
  * ) // false
  *
  * // ignoring millisecond, second, minute, hour and day
  * dateEquals(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss:l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
  *     toDate('2019/06/10 10:30'),
  *     toDate('2019/06/10 02:13'),
  *     2
@@ -331,7 +385,7 @@ export function plus(date: Date|string, period: string|number, duration: number)
  * 
  * // ignoring millisecond, second, minute and hour
  * dateEquals(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss:l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
  *     toDate('2019/06/10 10:30'),
  *     toDate('2019/06/10 02:13'),
  *     3
@@ -339,7 +393,7 @@ export function plus(date: Date|string, period: string|number, duration: number)
  * 
  * // ignoring millisecond, second and minute
  * dateEquals(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss:l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
  *     toDate('2019/06/10 10:30'),
  *     toDate('2019/06/10 02:13'),
  *     4
@@ -404,7 +458,7 @@ export function dateEquals(date1: Date|string, date2: Date|string, ignore: numbe
  * 
  * @example
  * dateEqualsReverse(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss:l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
  *     toDate('2019/10/06 10:40'), 
  *     toDate('2019/10/06 10:40')
  * ) // true
@@ -416,7 +470,7 @@ export function dateEquals(date1: Date|string, date2: Date|string, ignore: numbe
  *
  * // ignoring year, month and day
  * dateEqualsReverse(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss:l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
  *     toDate('2019/10/06 10:40'),
  *     toDate('2019/12/06 10:40'),
  *     4
@@ -424,7 +478,7 @@ export function dateEquals(date1: Date|string, date2: Date|string, ignore: numbe
  * 
  * // ignoring year and month
  * dateEqualsReverse(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss:l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
  *     toDate('2019/10/06 10:40'),
  *     toDate('2019/12/06 10:40'),
  *     5
@@ -432,7 +486,7 @@ export function dateEquals(date1: Date|string, date2: Date|string, ignore: numbe
  *
  * // ignoring year
  * dateEqualsReverse(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss:l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
  *     toDate('2019/10/06 10:40'),
  *     toDate('2019/12/06 10:40'),
  *     6
@@ -500,19 +554,19 @@ export function dateEqualsReverse(date1: Date|string, date2: Date|string, ignore
  * 
  * @example
  * getDateIgnore(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss:l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
  *     toDate('2019/06/10 10:30'),
  *     3
  * ) // Date only with year, month and day
  * 
  * getDateIgnore(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss:l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
  *     toDate('2019/06/10 10:30'),
  *     4
  * ) // Date only with year, month, day and hour
  * 
  * getDateIgnore(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss:l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
  *     toDate('2019/06/10 10:30'),
  *     7
  * ) // gets exactly the same date
@@ -534,10 +588,7 @@ export function getDateIgnore(date: Date|string, ignore: number = null): Date {
 	]
 
 	let dateArray = values.reduce((previous: number[], now: number, index: number) => {
-		let d = 0
-		if (index === 2) // day
-			d = 1
-		if ((ignore === 0 || ignore) && ignore >= 0 && index >= ignore) { return [...previous, d] }
+		if ((ignore === 0 || ignore) && ignore >= 0 && index >= ignore) { return [...previous, 0] }
 		return [...previous, now]
 	}, [])
 
@@ -572,19 +623,19 @@ export function getDateIgnore(date: Date|string, ignore: number = null): Date {
  * 
  * @example
  * getDateIgnoreReverse(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss:l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
  *     toDate('2019/06/10 10:30'),
  *     4
  * ) // Date only with hour, minute, second and millisecond
  * 
  * getDateIgnoreReverse(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss:l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
  *     toDate('2019/06/10 10:30'),
  *     5
  * ) // Date only with day, hour, minute, second and millisecond
  * 
  * getDateIgnoreReverse(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss:l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
  *     toDate('2019/06/10 10:30'),
  *     7
  * ) // gets exactly the same date
@@ -608,10 +659,7 @@ export function getDateIgnoreReverse(date: Date|string, ignore: number = null): 
 	values = values.reverse()
 
 	let dateArray = values.reduce((previous: number[], now: number, index: number) => {
-		let d = 0
-		if (index === 4) // day
-			d = 1
-		if ((ignore === 0 || ignore) && ignore >= 0 && index >= ignore) { return [...previous, d] }
+		if ((ignore === 0 || ignore) && ignore >= 0 && index >= ignore) { return [...previous, 0] }
 		return [...previous, now]
 	}, [])
 
