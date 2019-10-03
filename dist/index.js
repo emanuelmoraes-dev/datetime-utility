@@ -653,6 +653,8 @@ exports.formatTime = formatTime;
  * @param {Date|string} target - check to see if you are on scheduling.
  * @param {string|number} period - textual or numeric representation (stored in 'PERIODS') of a time period of the schedule
  * @param {number} duration - unit to include new periodic dates in schedule
+ * @param {string|number=} marginErrorPeriod - textual or numeric representation (stored in 'PERIODS') of a programming period to be used to define a "margin of error". (Default value: PERIODS.MILLISECOND)
+ * @param {number=} marginErrorDuration - margin of error value. (Default value: 0)
  * @returns {boolean} true if the date is present within a recurring schedule.
  *
  * @example
@@ -669,8 +671,28 @@ exports.formatTime = formatTime;
  *    PERIODS.SEMESTER,
  *    2
  * ) // returns false because the date 2025/07/02 is not included in a timeline for each two semester from the date of 2000/01/02
+ *
+ * dateInApointment(
+ *     toDate('2000/01/01'),
+ *     toDate('2025/07/03'),
+ *     PERIODS.SEMESTER,
+ *     1,
+ *     PERIODS.DAY,
+ *     1
+ * ) // returns false because the date 2025/07/03 is not included in a timeline for each semester from the date 2000/01/01 and the margin of error is only 1 day
+ *
+ * dateInApointment(
+ *     toDate('2000/01/01'),
+ *     toDate('2025/07/02'),
+ *     PERIODS.SEMESTER,
+ *     1,
+ *     PERIODS.DAY,
+ *     1
+ * ) // returns true because although the date 2025/07/02 is not included in a timeline for each semester from the date 2000/01/01, the margin of error has been set to 1 day
  */
-function dateInApointment(date, target, period, duration) {
+function dateInApointment(date, target, period, duration, marginErrorPeriod, marginErrorDuration) {
+    if (marginErrorPeriod === void 0) { marginErrorPeriod = exports.PERIODS.MILLISECOND; }
+    if (marginErrorDuration === void 0) { marginErrorDuration = 0; }
     if (date === null || date === undefined)
         throw new Error('date is null or undefined');
     if (target === null || target === undefined)
@@ -690,8 +712,12 @@ function dateInApointment(date, target, period, duration) {
     else if (typeof (target) === 'string')
         return null;
     var dateIt = date;
+    var timeTarget = target.getTime();
     while (dateIt.getTime() <= target.getTime()) {
-        if (dateEquals(dateIt, target))
+        var dateEndMargin = plus(dateIt, marginErrorPeriod, marginErrorDuration);
+        var timeBegin = dateIt.getTime();
+        var timeEnd = dateEndMargin.getTime();
+        if (timeTarget >= timeBegin && timeTarget <= timeEnd)
             return true;
         dateIt = plus(dateIt, period, duration);
     }

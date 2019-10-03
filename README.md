@@ -433,7 +433,7 @@ formatTime(
 
 The MONTH, TWO_MONTHS, SEMESTER, QUARTER, and YEAR variables can **not** be used in formatTime.
 
-## dateInApointment(date : Date | String, target : Date|String, period : String|Number, duration : Number)
+## dateInApointment(date : Date | String, target : Date|String, period : String|Number, duration : Number, marginErrorPeriod: string | number, marginErrorDuration: number)
 
 Returns true if the date is present within a recurring schedule.
 
@@ -446,6 +446,10 @@ Returns true if the date is present within a recurring schedule.
 * period: textual or numeric representation (stored in 'PERIODS') of a time period of the schedule
 
 * duration: unit to include new periodic dates in schedule
+
+* marginErrorPeriod: textual or numeric representation (stored in 'PERIODS') of a programming period to be used to define a "margin of error". (Default value: PERIODS.MILLISECOND)
+
+* marginErrorDuration: margin of error value. (Default value: 0)
 
 ### examples
 
@@ -463,6 +467,24 @@ dateInApointment(
     PERIODS.SEMESTER,
     2
 ) // returns false because the date 2025/07/02 is not included in a timeline for each two semester from the date of 2000/01/02
+
+dateInApointment(
+    toDate('2000/01/01'),
+    toDate('2025/07/03'),
+    PERIODS.SEMESTER,
+    1,
+    PERIODS.DAY,
+    1
+) // returns false because the date 2025/07/03 is not included in a timeline for each semester from the date 2000/01/01 and the margin of error is only 1 day
+
+dateInApointment(
+    toDate('2000/01/01'),
+    toDate('2025/07/02'),
+    PERIODS.SEMESTER,
+    1,
+    PERIODS.DAY,
+    1
+) // returns true because although the date 2025/07/02 is not included in a timeline for each semester from the date 2000/01/01, the margin of error has been set to 1 day
 ```
 
 ## scape(str : String)

@@ -443,6 +443,36 @@ describe("dateInApointment", () => {
             false
         )
     })
+
+    test("dateInApointment(toDate('2000/01/01'), toDate('2025/07/03'), PERIODS.SEMESTER, 1, PERIODS.DAY, 1)", async () => {
+        expect(
+            dateInApointment(
+                toDate('2000/01/01'),
+                toDate('2025/07/03'),
+                PERIODS.SEMESTER,
+                1,
+                PERIODS.DAY,
+                1
+            )
+        ).toBe(
+            false
+        )
+    })
+
+    test("dateInApointment(toDate('2000/01/01'), toDate('2025/07/02'), PERIODS.SEMESTER, 1, PERIODS.DAY, 1)", async () => {
+        expect(
+            dateInApointment(
+                toDate('2000/01/01'),
+                toDate('2025/07/02'),
+                PERIODS.SEMESTER,
+                1,
+                PERIODS.DAY,
+                1
+            )
+        ).toBe(
+            true
+        )
+    })
 })
 
 describe("scape", () => {

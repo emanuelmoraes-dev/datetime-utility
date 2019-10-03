@@ -12,18 +12,18 @@
  * console.log( isISODate( '2015-02-21T00:52' ) );         // false
  * console.log( isISODate( '2015-02-21T00Z' ) );           // false
  */
-export function isISODate (str : string) : boolean {
-	const isoDateRegExp = new RegExp( /(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))/ );
+export function isISODate(str: string): boolean {
+	const isoDateRegExp = new RegExp(/(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))/);
 	return isoDateRegExp.test(str);
 }
 
 export const PERIODS = {
 	MILLISECOND: 1,
 	SECOND: 1000,
-	MINUTE: 60*1000,
-	HOUR: 60*60*1000,
-	DAY: 24*60*60*1000,
-	WEEK: 7*24*60*60*1000,
+	MINUTE: 60 * 1000,
+	HOUR: 60 * 60 * 1000,
+	DAY: 24 * 60 * 60 * 1000,
+	WEEK: 7 * 24 * 60 * 60 * 1000,
 	MONTH: 'month',
 	TWO_MONTHS: 'two_months',
 	QUARTER: 'quarter',
@@ -166,7 +166,7 @@ export function toDate(str: string, pattern: string = 'yyyy/MM/dd hh:mm:ss.l'): 
  *     'dd/MM/yyyy hh:mm'
  * ) // null
  */
-export function dateToStr(date: Date|string, pattern: string = 'yyyy/MM/dd'): string {
+export function dateToStr(date: Date | string, pattern: string = 'yyyy/MM/dd'): string {
 	if (date === null || date === undefined) return null
 	if (pattern === null || pattern === undefined) return null
 
@@ -183,7 +183,7 @@ export function dateToStr(date: Date|string, pattern: string = 'yyyy/MM/dd'): st
 		let year = `${date.getFullYear()}`
 
 		let values = {
-			yyyy: year.length < 4 ? null:year,
+			yyyy: year.length < 4 ? null : year,
 			yy: year.substring(2),
 			y: year,
 			MM: month.length === 1 ? `0${month}` : month,
@@ -282,7 +282,7 @@ export function getMinPattern(strDate: string, pattern: string): string {
  *    1
  * ) // date with one year more
  */
-export function plus(date: Date|string, period: string|number, duration: number): Date {
+export function plus(date: Date | string, period: string | number, duration: number): Date {
 	if (date === null || date === undefined) return null
 	if (period === null || period === undefined) return null
 	if (duration === null || duration === undefined) return null
@@ -360,7 +360,7 @@ export function plus(date: Date|string, period: string|number, duration: number)
  *     4
  * ) // false
  */
-export function dateEquals(date1: Date|string, date2: Date|string, ignore: number = null): boolean {
+export function dateEquals(date1: Date | string, date2: Date | string, ignore: number = null): boolean {
 	if (date1 === null || date1 === undefined) throw new Error('date1 is null or undefined')
 	if (date2 === null || date2 === undefined) throw new Error('date2 is null or undefined')
 
@@ -441,7 +441,7 @@ export function dateEquals(date1: Date|string, date2: Date|string, ignore: numbe
  *     6
  * ) // false
  */
-export function dateEqualsReverse(date1: Date|string, date2: Date|string, ignore: number = null): boolean {
+export function dateEqualsReverse(date1: Date | string, date2: Date | string, ignore: number = null): boolean {
 	if (date1 === null || date1 === undefined) throw new Error('date1 is null or undefined')
 	if (date2 === null || date2 === undefined) throw new Error('date2 is null or undefined')
 
@@ -508,7 +508,7 @@ export function dateEqualsReverse(date1: Date|string, date2: Date|string, ignore
  *     7
  * ) // gets exactly the same date
  */
-export function getDateIgnore(date: Date|string, ignore: number = null): Date {
+export function getDateIgnore(date: Date | string, ignore: number = null): Date {
 	if (date === null || date === undefined) return null
 
 	if (typeof (date) === 'string' && isISODate(date)) { date = new Date(date) }
@@ -565,12 +565,12 @@ export function getDateIgnore(date: Date|string, ignore: number = null): Date {
  *     7
  * ) // gets exactly the same date
  */
-export function getDateIgnoreReverse(date: Date|string, ignore: number = null): Date {
+export function getDateIgnoreReverse(date: Date | string, ignore: number = null): Date {
 	if (date === null || date === undefined) return null
 
 	if (typeof (date) === 'string' && isISODate(date)) { date = new Date(date) }
 	else if (typeof (date) === 'string') return null
-	
+
 	let values = [
 		date.getFullYear(),
 		date.getMonth(),
@@ -619,11 +619,11 @@ export function getDateIgnoreReverse(date: Date|string, ignore: number = null): 
  *     PERIODS.SECOND
  * ) // [<amount of minutes in 200100 milliseconds>, <number of seconds remaining>]
  */
-export function formatTime (time: number, ...args: number[]): number[] {
+export function formatTime(time: number, ...args: number[]): number[] {
 	if (time === null || time === undefined) return null
 
 	let ret = []
-	for(let arg of args) {
+	for (let arg of args) {
 		ret.push(Math.floor(time / arg))
 		time = time % arg
 	}
@@ -636,6 +636,8 @@ export function formatTime (time: number, ...args: number[]): number[] {
  * @param {Date|string} target - check to see if you are on scheduling.
  * @param {string|number} period - textual or numeric representation (stored in 'PERIODS') of a time period of the schedule
  * @param {number} duration - unit to include new periodic dates in schedule
+ * @param {string|number=} marginErrorPeriod - textual or numeric representation (stored in 'PERIODS') of a programming period to be used to define a "margin of error". (Default value: PERIODS.MILLISECOND)
+ * @param {number=} marginErrorDuration - margin of error value. (Default value: 0)
  * @returns {boolean} true if the date is present within a recurring schedule.
  * 
  * @example
@@ -652,8 +654,33 @@ export function formatTime (time: number, ...args: number[]): number[] {
  *    PERIODS.SEMESTER,
  *    2
  * ) // returns false because the date 2025/07/02 is not included in a timeline for each two semester from the date of 2000/01/02
+ * 
+ * dateInApointment(
+ *     toDate('2000/01/01'),
+ *     toDate('2025/07/03'),
+ *     PERIODS.SEMESTER,
+ *     1,
+ *     PERIODS.DAY,
+ *     1
+ * ) // returns false because the date 2025/07/03 is not included in a timeline for each semester from the date 2000/01/01 and the margin of error is only 1 day
+ * 
+ * dateInApointment(
+ *     toDate('2000/01/01'),
+ *     toDate('2025/07/02'),
+ *     PERIODS.SEMESTER,
+ *     1,
+ *     PERIODS.DAY,
+ *     1
+ * ) // returns true because although the date 2025/07/02 is not included in a timeline for each semester from the date 2000/01/01, the margin of error has been set to 1 day
  */
-export function dateInApointment(date: Date|string, target: Date|string, period: string|number, duration: number): boolean {
+export function dateInApointment(
+	date: Date | string,
+	target: Date | string,
+	period: string | number,
+	duration: number,
+	marginErrorPeriod: string | number = PERIODS.MILLISECOND,
+	marginErrorDuration: number = 0
+): boolean {
 	if (date === null || date === undefined) throw new Error('date is null or undefined')
 	if (target === null || target === undefined) throw new Error('target is null or undefined')
 	if (period === null || period === undefined) throw new Error('period is null or undefined')
@@ -666,10 +693,16 @@ export function dateInApointment(date: Date|string, target: Date|string, period:
 	else if (typeof (target) === 'string') return null
 
 	let dateIt = date
+	const timeTarget = target.getTime()
 
 	while (dateIt.getTime() <= target.getTime()) {
-		if (dateEquals(dateIt, target))
+		let dateEndMargin = plus(dateIt, marginErrorPeriod, marginErrorDuration)
+		const timeBegin = dateIt.getTime()
+		const timeEnd = dateEndMargin.getTime()
+
+		if (timeTarget >= timeBegin && timeTarget <= timeEnd)
 			return true
+
 		dateIt = plus(dateIt, period, duration)
 	}
 
