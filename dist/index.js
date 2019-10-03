@@ -7,7 +7,25 @@ var __spreadArrays = (this && this.__spreadArrays) || function () {
     return r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var isISODate = require('is-iso-date');
+/**
+ * check if a string is an ISO-compliant date
+ * @param str - string to check
+ * @returns true if a string is an ISO-compliant date
+ *
+ * @example
+ * console.log( isISODate( '2015-02-21T00:52:43.822Z' ) ); // true
+ * console.log( isISODate( '2015-02-21T00:52:43.822' ) );  // false
+ * console.log( isISODate( '2015-02-21T00:52:43Z' ) );     // true
+ * console.log( isISODate( '2015-02-21T00:52:43' ) );      // false
+ * console.log( isISODate( '2015-02-21T00:52Z' ) );        // true
+ * console.log( isISODate( '2015-02-21T00:52' ) );         // false
+ * console.log( isISODate( '2015-02-21T00Z' ) );           // false
+ */
+function isISODate(str) {
+    var isoDateRegExp = new RegExp(/(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))/);
+    return isoDateRegExp.test(str);
+}
+exports.isISODate = isISODate;
 exports.PERIODS = {
     MILLISECOND: 1,
     SECOND: 1000,
@@ -25,23 +43,7 @@ exports.PERIODS = {
  * Returns a date based on a string with a given pattern
  * @param {string} str - String to convert to date
  * @param {string=} pattern - String containing date mask (default value 'yyyy/MM/dd hh:mm:ss.l')
- * @returns {Date}
- *
- * | Pattern | Description                                             |
- * | ------- | ------------------------------------------------------- |
- * | dd      | day of the month containing two characters              |
- * | d       | day of the month                                        |
- * | MM      | month of the year (minimum 1) containing two characters |
- * | M       | month of the year                                       |
- * | yyyy    | full year containing four characters                    |
- * | y       | full year                                               |
- * | hh      | hours of day with two characters                        |
- * | h       | hours of day                                            |
- * | mm      | minutes of hour with two characters                     |
- * | m       | minutes of hour                                         |
- * | ss      | seconds of minute with two characters                   |
- * | s       | seconds of minute                                       |
- * | l       | millisecond of second                                   |
+ * @returns {Date} date based on a string with a given pattern
  *
  * @example
  * toDate('10/06/2019 21:13', 'dd/MM/yyyy hh:mm') // returns Date
@@ -146,24 +148,7 @@ exports.toDate = toDate;
  * Converts a date to a string in the format described in the pattern
  * @param {Date|string} date - Date (or string in ISO format) to convert to string
  * @param {string=} pattern - date format (default value: 'yyyy/MM/dd')
- * @returns {string}
- *
- * | Pattern | Description                                             |
- * | ------- | ------------------------------------------------------- |
- * | dd      | day of the month containing two characters              |
- * | d       | day of the month                                        |
- * | MM      | month of the year (minimum 1) containing two characters |
- * | M       | month of the year                                       |
- * | yyyy    | full year containing four characters                    |
- * | yy      | year containing the last two digits                     |
- * | y       | full year                                               |
- * | hh      | hours of day with two characters                        |
- * | h       | hours of day                                            |
- * | mm      | minutes of hour with two characters                     |
- * | m       | minutes of hour                                         |
- * | ss      | seconds of minute with two characters                   |
- * | s       | seconds of minute                                       |
- * | l       | millisecond of second                                   |
+ * @returns {string} string in the format described in the pattern
  *
  * @example
  * dateToStr(
@@ -240,24 +225,7 @@ exports.dateToStr = dateToStr;
  * Returns the minimum pattern  (strictly necessary) of a given formatted string representing a date
  * @param {string} strDate - date in string format
  * @param {string} pattern - 'strDate' parameter date format
- * @returns {string}
- *
- * | Pattern | Description                                             |
- * | ------- | ------------------------------------------------------- |
- * | dd      | day of the month containing two characters              |
- * | d       | day of the month                                        |
- * | MM      | month of the year (minimum 1) containing two characters |
- * | M       | month of the year                                       |
- * | yyyy    | full year containing four characters                    |
- * | yy      | year containing the last two digits                     |
- * | y       | full year                                               |
- * | hh      | hours of day with two characters                        |
- * | h       | hours of day                                            |
- * | mm      | minutes of hour with two characters                     |
- * | m       | minutes of hour                                         |
- * | ss      | seconds of minute with two characters                   |
- * | s       | seconds of minute                                       |
- * | l       | millisecond of second                                   |
+ * @returns {string} minimum pattern  (strictly necessary) of a given formatted string representing a date
  *
  * @example
  * let date = toDate('10/06/2019 21:13', 'dd/MM/yyyy hh:mm:ss.l')
@@ -360,19 +328,7 @@ exports.plus = plus;
  * @param {Date|string} date1 - first date (or string in ISO format) of comparison
  * @param {Date|string} date2 - second date (or string in ISO format) of comparison
  * @param {number} ignore - position from which the **lowest** values will be ignored (if not informed, nothing is ignored.)
- * @returns {boolean}
- *
- * | ignore  | ignored values                                        |
- * | ------- | ----------------------------------------------------- |
- * | default | nothing ignored                                       |
- * | 7       | nothing ignored                                       |
- * | 6       | millisecond                                           |
- * | 5       | millisecond and second                                |
- * | 4       | millisecond, second and minute                        |
- * | 3       | millisecond, second, minute and hour                  |
- * | 2       | millisecond, second, minute, hour and day             |
- * | 1       | millisecond, second, minute, hour, day and month      |
- * | 0       | ignoring everything, that is, the dates are the same  |
+ * @returns {boolean} true if both dates are equal, ignoring certain **lower** values
  *
  * @example
  * dateEquals(
@@ -463,19 +419,7 @@ exports.dateEquals = dateEquals;
  * @param {Date|string} date1 - first date (or string in ISO format) of comparison
  * @param {Date|string} date2 - second date (or string in ISO format) of comparison
  * @param {number} ignore  - position from which the **highest** values will be ignored (if not informed, nothing will be ignored).
- * @returns {boolean}
- *
- * | ignore  | ignored values                                        |
- * | ------- | ----------------------------------------------------- |
- * | default | nothing ignored                                       |
- * | 7       | nothing ignored                                       |
- * | 6       | year                                                  |
- * | 5       | year and month                                        |
- * | 4       | year, month and day                                   |
- * | 3       | year, month, day and hour                             |
- * | 2       | year, month, day, hour and minute                     |
- * | 1       | year, month, day, hour, minute and second             |
- * | 0       | ignoring everything, that is, the dates are the same  |
+ * @returns {boolean} true if both dates are equal, ignoring certain **higher** values
  *
  * @example
  * dateEqualsReverse(
@@ -567,19 +511,7 @@ exports.dateEqualsReverse = dateEqualsReverse;
  * Gets date ignoring **lower** values
  * @param {Date|string} date - date (or string in ISO format) that will have higher values ignored
  * @param {number} ignore - position from which the **lowest** values will be ignored (if not informed, nothing is ignored.)
- * @returns {Date}
- *
- * | ignore  | ignored values                                        |
- * | ------- | ----------------------------------------------------- |
- * | default | nothing ignored                                       |
- * | 7       | nothing ignored                                       |
- * | 6       | millisecond                                           |
- * | 5       | millisecond and second                                |
- * | 4       | millisecond, second and minute                        |
- * | 3       | millisecond, second, minute and hour                  |
- * | 2       | millisecond, second, minute, hour and day             |
- * | 1       | millisecond, second, minute, hour, day and month      |
- * | 0       | ignoring everything                                   |
+ * @returns {Date} date ignoring **lower** values
  *
  * @example
  * getDateIgnore(
@@ -631,19 +563,7 @@ exports.getDateIgnore = getDateIgnore;
  * Gets date ignoring **high** values
  * @param {Date|string} date - date (or string in ISO format) that will have higher values ignored
  * @param {number} ignore - position from which the **highest** values will be ignored (if not informed, nothing will be ignored).
- * @returns {Date}
- *
- * | ignore  | ignored values                                        |
- * | ------- | ----------------------------------------------------- |
- * | default | nothing ignored                                       |
- * | 7       | nothing ignored                                       |
- * | 6       | year                                                  |
- * | 5       | year and month                                        |
- * | 4       | year, month and day                                   |
- * | 3       | year, month, day and hour                             |
- * | 2       | year, month, day, hour and minute                     |
- * | 1       | year, month, day, hour, minute and second             |
- * | 0       | ignoring everything, that is, the dates are the same  |
+ * @returns {Date} date ignoring **high** values
  *
  * @example
  * getDateIgnoreReverse(
@@ -702,7 +622,7 @@ exports.getDateIgnoreReverse = getDateIgnoreReverse;
  *
  * @param {number} time - milliseconds obtained by the getTime() function
  * @param {...number} args - types of values to be extracted and placed in an array
- * @returns {number[]}
+ * @returns {number[]} values from a time
  *
  * @example
  * formatTime(
@@ -721,7 +641,7 @@ function formatTime(time) {
     var ret = [];
     for (var _a = 0, args_1 = args; _a < args_1.length; _a++) {
         var arg = args_1[_a];
-        ret.push(Math.trunc(time / arg));
+        ret.push(Math.floor(time / arg));
         time = time % arg;
     }
     return ret;
@@ -733,7 +653,7 @@ exports.formatTime = formatTime;
  * @param {Date|string} target - check to see if you are on scheduling.
  * @param {string|number} period - textual or numeric representation (stored in 'PERIODS') of a time period of the schedule
  * @param {number} duration - unit to include new periodic dates in schedule
- * @returns {boolean}
+ * @returns {boolean} true if the date is present within a recurring schedule.
  *
  * @example
  * dateInApointment(
@@ -781,7 +701,7 @@ exports.dateInApointment = dateInApointment;
 /**
  * Returns string with special regular expression characters with escape
  * @param {string} str - string to have its special RegExp characters with escape
- * @returns {string}
+ * @returns {string} string with special regular expression characters with escape
  *
  * @example
  * scape('ab.*+?^${c}()|d[]\\ef') // ab\.\*\+\?\^\$\{c\}\(\)\|d\[\]\\ef

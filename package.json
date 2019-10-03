@@ -9,7 +9,7 @@
     "utility",
     "tools"
   ],
-  "types": "dist/index.d.ts", 
+  "types": "dist/index.d.ts",
   "main": "dist/index.js",
   "repository": "https://github.com/emanuelmoraes-dev/datetime-utility",
   "author": {
@@ -18,9 +18,7 @@
   },
   "license": "MIT",
   "private": false,
-  "dependencies": {
-    "is-iso-date": "^0.0.1"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/jest": "^24.0.18",
     "@types/node": "^12.7.2",

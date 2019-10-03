@@ -22,6 +22,26 @@ npm install datetime-utility --save
 * SEMESTER
 * YEAR
 
+## isISODate(str : String)
+
+check if a string is an ISO-compliant date
+
+### parameters
+
+* str: string to check
+
+### examples
+
+```js
+console.log( isISODate( '2015-02-21T00:52:43.822Z' ) ); // true
+console.log( isISODate( '2015-02-21T00:52:43.822' ) );  // false
+console.log( isISODate( '2015-02-21T00:52:43Z' ) );     // true
+console.log( isISODate( '2015-02-21T00:52:43' ) );      // false
+console.log( isISODate( '2015-02-21T00:52Z' ) );        // true
+console.log( isISODate( '2015-02-21T00:52' ) );         // false
+console.log( isISODate( '2015-02-21T00Z' ) );           // false
+```
+
 ## toDate(str : String, pattern : String)
 
 Returns a date based on a string with a given pattern
