@@ -50,7 +50,7 @@ Returns a date based on a string with a given pattern
 
 * str: String to convert to date
 
-* pattern: String containing date mask (default value 'yyyy/MM/dd hh:mm:ss.l')
+* pattern: String containing date mask (default value 'yyyy/MM/dd hh:mm:ss.S')
 
 Pattern | Description
 ------- | ------------------------------------------
@@ -66,7 +66,9 @@ mm      | minutes of hour with two characters
 m       | minutes of hour
 ss      | seconds of minute with two characters
 s       | seconds of minute
-l       | millisecond of second
+SSS     | millisecond of second with tree characters
+SS      | millisecond of second with at least two characters
+S       | millisecond of second
 
 
 ### examples
@@ -74,7 +76,13 @@ l       | millisecond of second
 ```js
 toDate('10/06/2019 21:13', 'dd/MM/yyyy hh:mm') // returns Date
 toDate('10/6/2019 21:13', 'd/M/yyyy hh:mm') // returns Date
-toDate('10/6/2019 21:13', 'dd/MM/yyyy hh:mm') // returns null, month invalid
+toDate('10/6/2019 21:13:49.5', 'd/M/yyyy hh:mm:ss.S') // returns Date
+toDate('10/6/2019 21:13:49.5', 'd/M/yyyy hh:mm:ss.SS') // returns null, invalid millisecond
+toDate('10/6/2019 21:13:49.59', 'd/M/yyyy hh:mm:ss.SS') // returns Date
+toDate('10/6/2019 21:13:49.593', 'd/M/yyyy hh:mm:ss.SS') // returns Date
+toDate('10/6/2019 21:13:49.593', 'd/M/yyyy hh:mm:ss.SSS') // returns Date
+toDate('10/6/2019 21:13:49.5', 'd/M/yyyy hh:mm:ss.SSS') // returns null, invalid millisecond
+toDate('10/6/2019 21:13', 'dd/MM/yyyy hh:mm') // returns null, invalid month
 ```
 
 ## dateToStr(date : Date|String, pattern : String)
@@ -102,7 +110,9 @@ mm      | minutes of hour with two characters
 m       | minutes of hour
 ss      | seconds of minute with two characters
 s       | seconds of minute
-l       | millisecond of second
+SSS     | millisecond of second with tree characters
+SS      | millisecond of second with at least two characters
+S       | millisecond of second
 
 ### examples
 
@@ -116,6 +126,31 @@ dateToStr(
     toDate('10/6/2019 21:13', 'd/M/yyyy hh:mm'),
     'd/M/yyyy hh:mm'
 ) // 10/6/2019 21:13
+
+dateToStr(
+     toDate('10/6/2019 21:13', 'd/M/yyyy hh:mm'),
+     'd/M/yy hh:mm'
+ ) // 10/6/19 21:13
+
+dateToStr(
+    toDate('10/6/2019 21:13:26.2', 'd/M/yyyy hh:mm:ss.S'),
+    'd/M/yyyy hh:mm:ss.SSS'
+) // 10/6/2019 21:13:26.002
+
+dateToStr(
+    toDate('10/6/2019 21:13:26.2', 'd/M/yyyy hh:mm:ss.S'),
+    'd/M/yyyy hh:mm:ss.SS'
+) // 10/6/2019 21:13:26.02
+
+dateToStr(
+    toDate('10/6/2019 21:13:26.2', 'd/M/yyyy hh:mm:ss.S'),
+    'd/M/yyyy hh:mm:ss.S'
+) // 10/6/2019 21:13:26.2
+
+dateToStr(
+    toDate('10/6/2019 21:13:26.273', 'd/M/yyyy hh:mm:ss.S'),
+    'd/M/yyyy hh:mm:ss.SS'
+) // 10/6/2019 21:13:26.27
 
 dateToStr(
     null,
@@ -147,13 +182,15 @@ mm      | minutes of hour with two characters
 m       | minutes of hour
 ss      | seconds of minute with two characters
 s       | seconds of minute
-l       | millisecond of second
+SSS     | millisecond of second with tree characters
+SS      | millisecond of second with at least two characters
+S       | millisecond of second
 
 ### examples
 
 ```js
-let date = toDate('10/06/2019 21:13', 'dd/MM/yyyy hh:mm:ss.l')
-let minPattern = getMinPattern('10/06/2019 21:13', 'dd/MM/yyyy hh:mm:ss.l') // dd/MM/yyyy hh:mm
+let date = toDate('10/06/2019 21:13', 'dd/MM/yyyy hh:mm:ss.S')
+let minPattern = getMinPattern('10/06/2019 21:13', 'dd/MM/yyyy hh:mm:ss.S') // dd/MM/yyyy hh:mm
 date = plus(date, PERIODS.YEAR, 1)
 dateToStr(date, minPattern) // 10/06/2020 21:13
 
@@ -164,7 +201,7 @@ dateToStr(date, minPattern) // 10/06/2020 21:13
 
 getMinPattern(
     null,
-    'dd/MM/yyyy hh:mm:ss.l'
+    'dd/MM/yyyy hh:mm:ss.S'
 ) // null
 ```
 
@@ -229,14 +266,14 @@ dateEquals(
 ) // true
 
 dateEquals(
-    // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+    // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
     toDate('2019/06/10 10:30'),
     toDate('2019/06/10 02:13')
 ) // false
 
 // ignoring millisecond, second, minute, hour and day
 dateEquals(
-    // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+    // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
     toDate('2019/06/10 10:30'),
     toDate('2019/06/10 02:13'),
     2
@@ -244,7 +281,7 @@ dateEquals(
 
 // ignoring millisecond, second, minute and hour
 dateEquals(
-    // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+    // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
     toDate('2019/06/10 10:30'),
     toDate('2019/06/10 02:13'),
     3
@@ -252,7 +289,7 @@ dateEquals(
 
 // ignoring millisecond, second and minute
 dateEquals(
-    // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+    // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
     toDate('2019/06/10 10:30'),
     toDate('2019/06/10 02:13'),
     4
@@ -287,7 +324,7 @@ default | nothing ignored
 
 ```js
 dateEqualsReverse(
-    // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+    // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
     toDate('2019/10/06 10:40'), 
     toDate('2019/10/06 10:40')
 ) // true
@@ -299,7 +336,7 @@ dateEqualsReverse(
 
 // ignoring year, month and day
 dateEqualsReverse(
-    // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+    // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
     toDate('2019/10/06 10:40'),
     toDate('2019/12/06 10:40'),
     4
@@ -307,7 +344,7 @@ dateEqualsReverse(
 
 // ignoring year and month
 dateEqualsReverse(
-    // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+    // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
     toDate('2019/10/06 10:40'),
     toDate('2019/12/06 10:40'),
     5
@@ -315,7 +352,7 @@ dateEqualsReverse(
 
 // ignoring year
 dateEqualsReverse(
-    // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+    // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
     toDate('2019/10/06 10:40'),
     toDate('2019/12/06 10:40'),
     6
@@ -348,19 +385,19 @@ default | nothing ignored
 
 ```js
 getDateIgnore(
-    // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+    // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
     toDate('2019/06/10 10:30'),
     3
 ) // Date only with year, month and day
 
 getDateIgnore(
-    // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+    // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
     toDate('2019/06/10 10:30'),
     4
 ) // Date only with year, month, day and hour
 
 getDateIgnore(
-    // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+    // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
     toDate('2019/06/10 10:30'),
     7
 ) // gets exactly the same date
@@ -392,19 +429,19 @@ default | nothing ignored
 
 ```js
 getDateIgnoreReverse(
-    // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+    // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
     toDate('2019/06/10 10:30'),
     4
 ) // Date only with hour, minute, second and millisecond
 
 getDateIgnoreReverse(
-    // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+    // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
     toDate('2019/06/10 10:30'),
     5
 ) // Date only with day, hour, minute, second and millisecond
 
 getDateIgnoreReverse(
-    // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+    // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
     toDate('2019/06/10 10:30'),
     7
 ) // gets exactly the same date

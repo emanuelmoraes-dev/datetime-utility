@@ -22,6 +22,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * console.log( isISODate( '2015-02-21T00Z' ) );           // false
  */
 function isISODate(str) {
+    if (typeof str !== 'string')
+        return false;
     var isoDateRegExp = new RegExp(/(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))/);
     return isoDateRegExp.test(str);
 }
@@ -42,23 +44,31 @@ exports.PERIODS = {
 /**
  * Returns a date based on a string with a given pattern
  * @param {string} str - String to convert to date
- * @param {string=} pattern - String containing date mask (default value 'yyyy/MM/dd hh:mm:ss.l')
+ * @param {string=} pattern - String containing date mask (default value 'yyyy/MM/dd hh:mm:ss.S')
  * @returns {Date} date based on a string with a given pattern
  *
  * @example
  * toDate('10/06/2019 21:13', 'dd/MM/yyyy hh:mm') // returns Date
  * toDate('10/6/2019 21:13', 'd/M/yyyy hh:mm') // returns Date
- * toDate('10/6/2019 21:13', 'dd/MM/yyyy hh:mm') // returns null, month invalid
+ * toDate('10/6/2019 21:13:49.5', 'd/M/yyyy hh:mm:ss.S') // returns Date
+ * toDate('10/6/2019 21:13:49.5', 'd/M/yyyy hh:mm:ss.SS') // returns null, invalid millisecond
+ * toDate('10/6/2019 21:13:49.59', 'd/M/yyyy hh:mm:ss.SS') // returns Date
+ * toDate('10/6/2019 21:13:49.593', 'd/M/yyyy hh:mm:ss.SS') // returns Date
+ * toDate('10/6/2019 21:13:49.593', 'd/M/yyyy hh:mm:ss.SSS') // returns Date
+ * toDate('10/6/2019 21:13:49.5', 'd/M/yyyy hh:mm:ss.SSS') // returns null, invalid millisecond
+ * toDate('10/6/2019 21:13', 'dd/MM/yyyy hh:mm') // returns null, invalid month
  */
 function toDate(str, pattern) {
-    if (pattern === void 0) { pattern = 'yyyy/MM/dd hh:mm:ss.l'; }
-    if (str === null || str === undefined)
+    if (pattern === void 0) { pattern = 'yyyy/MM/dd hh:mm:ss.S'; }
+    if (typeof str !== 'string')
         return null;
-    if (pattern === null || pattern === undefined)
+    if (typeof pattern !== 'string')
         return null;
     if (!str.trim())
         return null;
-    var expPattern = /yyyy|y|MM|M|dd|d|hh|h|mm|m|ss|s|l/g;
+    if (!pattern.trim())
+        return null;
+    var expPattern = /yyyy|y|MM|M|dd|d|hh|h|mm|m|ss|s|SSS|SS|S/g;
     var seps = pattern.split(expPattern);
     var sepsScape = seps.filter(function (s) { return s; }).map(scape);
     var expSepsScape = new RegExp(sepsScape.join('|'), 'g');
@@ -88,6 +98,8 @@ function toDate(str, pattern) {
             case 'dd': {
                 if (value.length !== 2)
                     return null;
+                dateValues.day = v;
+                break;
             }
             case 'd': {
                 dateValues.day = v;
@@ -96,6 +108,8 @@ function toDate(str, pattern) {
             case 'MM': {
                 if (value.length !== 2)
                     return null;
+                dateValues.month = v;
+                break;
             }
             case 'M': {
                 dateValues.month = v;
@@ -104,6 +118,8 @@ function toDate(str, pattern) {
             case 'yyyy': {
                 if (value.length !== 4)
                     return null;
+                dateValues.year = v;
+                break;
             }
             case 'y': {
                 dateValues.year = v;
@@ -112,6 +128,8 @@ function toDate(str, pattern) {
             case 'hh': {
                 if (value.length !== 2)
                     return null;
+                dateValues.hour = v;
+                break;
             }
             case 'h': {
                 dateValues.hour = v;
@@ -120,6 +138,8 @@ function toDate(str, pattern) {
             case 'mm': {
                 if (value.length !== 2)
                     return null;
+                dateValues.minute = v;
+                break;
             }
             case 'm': {
                 dateValues.minute = v;
@@ -128,12 +148,26 @@ function toDate(str, pattern) {
             case 'ss': {
                 if (value.length !== 2)
                     return null;
+                dateValues.second = v;
+                break;
             }
             case 's': {
                 dateValues.second = v;
                 break;
             }
-            case 'l': {
+            case 'SSS': {
+                if (value.length !== 3)
+                    return null;
+                dateValues.millisecond = v;
+                break;
+            }
+            case 'SS': {
+                if (value.length < 2 || value.length > 3)
+                    return null;
+                dateValues.millisecond = v;
+                break;
+            }
+            case 'S': {
                 dateValues.millisecond = v;
                 break;
             }
@@ -162,20 +196,47 @@ exports.toDate = toDate;
  * ) // 10/6/2019 21:13
  *
  * dateToStr(
+ *     toDate('10/6/2019 21:13', 'd/M/yyyy hh:mm'),
+ *     'd/M/yy hh:mm'
+ * ) // 10/6/19 21:13
+ *
+ * dateToStr(
+ *     toDate('10/6/2019 21:13:26.2', 'd/M/yyyy hh:mm:ss.S'),
+ *     'd/M/yyyy hh:mm:ss.SSS'
+ * ) // 10/6/2019 21:13:26.002
+ *
+ * dateToStr(
+ *     toDate('10/6/2019 21:13:26.2', 'd/M/yyyy hh:mm:ss.S'),
+ *     'd/M/yyyy hh:mm:ss.SS'
+ * ) // 10/6/2019 21:13:26.02
+ *
+ * dateToStr(
+ *     toDate('10/6/2019 21:13:26.2', 'd/M/yyyy hh:mm:ss.S'),
+ *     'd/M/yyyy hh:mm:ss.S'
+ * ) // 10/6/2019 21:13:26.2
+ *
+ * dateToStr(
+ *     toDate('10/6/2019 21:13:26.273', 'd/M/yyyy hh:mm:ss.S'),
+ *     'd/M/yyyy hh:mm:ss.SS'
+ * ) // 10/6/2019 21:13:26.27
+ *
+ * dateToStr(
  *     null,
  *     'dd/MM/yyyy hh:mm'
  * ) // null
  */
 function dateToStr(date, pattern) {
     if (pattern === void 0) { pattern = 'yyyy/MM/dd'; }
-    if (date === null || date === undefined)
+    if (!(date instanceof Date) && typeof date !== 'string')
         return null;
-    if (pattern === null || pattern === undefined)
+    if (typeof pattern !== 'string')
         return null;
-    if (typeof (date) === 'string' && isISODate(date)) {
+    if (!pattern.trim())
+        return null;
+    if (typeof date === 'string' && isISODate(date)) {
         date = new Date(date);
     }
-    else if (typeof (date) === 'string')
+    else if (typeof date === 'string')
         return null;
     if (date instanceof Date) {
         var day = "" + date.getDate();
@@ -186,8 +247,8 @@ function dateToStr(date, pattern) {
         var millisecond = "" + date.getMilliseconds();
         var year = "" + date.getFullYear();
         var values_1 = {
-            yyyy: year.length < 4 ? null : year,
-            yy: year.substring(2),
+            yyyy: year,
+            yy: year.substring(year.length - 2),
             y: year,
             MM: month.length === 1 ? "0" + month : month,
             M: month,
@@ -199,10 +260,12 @@ function dateToStr(date, pattern) {
             m: minute,
             ss: second.length === 1 ? "0" + second : second,
             s: second,
-            l: millisecond,
+            SSS: millisecond.length === 2 ? "0" + millisecond : millisecond.length === 1 ? "00" + millisecond : millisecond,
+            SS: millisecond.length === 3 ? "" + millisecond[0] + millisecond[1] : millisecond.length === 1 ? "0" + millisecond : millisecond,
+            S: millisecond,
             '': ''
         };
-        var expPattern = /yyyy|yy|y|MM|M|dd|d|hh|h|mm|m|ss|s|l/g;
+        var expPattern = /yyyy|yy|y|MM|M|dd|d|hh|h|mm|m|ss|s|SSS|SS|S/g;
         var seps = pattern.split(expPattern);
         var sepsScape = seps.filter(function (s) { return s; }).map(scape);
         var mask_1 = pattern.split(new RegExp(sepsScape.join('|'), 'g')).filter(function (p) { return p; });
@@ -228,8 +291,8 @@ exports.dateToStr = dateToStr;
  * @returns {string} minimum pattern  (strictly necessary) of a given formatted string representing a date
  *
  * @example
- * let date = toDate('10/06/2019 21:13', 'dd/MM/yyyy hh:mm:ss.l')
- * let minPattern = getMinPattern('10/06/2019 21:13', 'dd/MM/yyyy hh:mm:ss.l') // dd/MM/yyyy hh:mm
+ * let date = toDate('10/06/2019 21:13', 'dd/MM/yyyy hh:mm:ss.S')
+ * let minPattern = getMinPattern('10/06/2019 21:13', 'dd/MM/yyyy hh:mm:ss.S') // dd/MM/yyyy hh:mm
  * date = plus(date, PERIODS.YEAR, 1)
  * dateToStr(date, minPattern) // 10/06/2020 21:13
  *
@@ -240,17 +303,19 @@ exports.dateToStr = dateToStr;
  *
  * getMinPattern(
  *     null,
- *     'dd/MM/yyyy hh:mm:ss.l'
+ *     'dd/MM/yyyy hh:mm:ss.S'
  * ) // null
  */
 function getMinPattern(strDate, pattern) {
-    if (strDate === null || strDate === undefined)
+    if (typeof strDate !== 'string')
         return null;
-    if (pattern === null || pattern === undefined)
+    if (typeof pattern !== 'string')
         return null;
     if (!strDate.trim())
         return null;
-    var expPattern = /yyyy|y|MM|M|dd|d|hh|h|mm|m|ss|s|l/g;
+    if (!pattern.trim())
+        return null;
+    var expPattern = /yyyy|y|MM|M|dd|d|hh|h|mm|m|ss|s|SSS|SS|S/g;
     var seps = pattern.split(expPattern);
     var sepsScape = seps.filter(function (s) { return s; }).map(scape);
     var expSepsScape = new RegExp(sepsScape.join('|'), 'g');
@@ -286,16 +351,16 @@ exports.getMinPattern = getMinPattern;
  * ) // date with one year more
  */
 function plus(date, period, duration) {
-    if (date === null || date === undefined)
+    if (!(date instanceof Date) && typeof date !== 'string')
         return null;
-    if (period === null || period === undefined)
+    if (typeof period !== 'string' && typeof period !== 'number')
         return null;
-    if (duration === null || duration === undefined)
+    if (typeof duration !== 'number')
         return null;
-    if (typeof (date) === 'string' && isISODate(date)) {
+    if (typeof date === 'string' && isISODate(date)) {
         date = new Date(date);
     }
-    else if (typeof (date) === 'string')
+    else if (typeof date === 'string')
         return null;
     var _a = [
         date.getDate(),
@@ -319,7 +384,7 @@ function plus(date, period, duration) {
         case exports.PERIODS.QUARTER: return new Date(year, month + duration * 3, day, hour, minute, second, millisecond);
         case exports.PERIODS.YEAR: return new Date(year + duration, month, day, hour, minute, second, millisecond);
         default:
-            throw new Error("Per\u00EDodo " + period + " inv\u00E1lido");
+            throw new Error("Invalid period " + period);
     }
 }
 exports.plus = plus;
@@ -337,14 +402,14 @@ exports.plus = plus;
  * ) // true
  *
  * dateEquals(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
  *     toDate('2019/06/10 10:30'),
  *     toDate('2019/06/10 02:13')
  * ) // false
  *
  * // ignoring millisecond, second, minute, hour and day
  * dateEquals(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
  *     toDate('2019/06/10 10:30'),
  *     toDate('2019/06/10 02:13'),
  *     2
@@ -352,7 +417,7 @@ exports.plus = plus;
  *
  * // ignoring millisecond, second, minute and hour
  * dateEquals(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
  *     toDate('2019/06/10 10:30'),
  *     toDate('2019/06/10 02:13'),
  *     3
@@ -360,7 +425,7 @@ exports.plus = plus;
  *
  * // ignoring millisecond, second and minute
  * dateEquals(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
  *     toDate('2019/06/10 10:30'),
  *     toDate('2019/06/10 02:13'),
  *     4
@@ -368,20 +433,22 @@ exports.plus = plus;
  */
 function dateEquals(date1, date2, ignore) {
     if (ignore === void 0) { ignore = null; }
-    if (date1 === null || date1 === undefined)
-        throw new Error('date1 is null or undefined');
-    if (date2 === null || date2 === undefined)
-        throw new Error('date2 is null or undefined');
+    if (!(date1 instanceof Date) && typeof date1 !== 'string')
+        throw new Error('date1 not is Date or string');
+    if (!(date2 instanceof Date) && typeof date2 !== 'string')
+        throw new Error('date2 not is Date or string');
+    if (typeof ignore !== 'number' && ignore !== null && ignore !== undefined)
+        throw new Error('ignore not is number or null or undefined');
     if (typeof (date1) === 'string' && isISODate(date1)) {
         date1 = new Date(date1);
     }
     else if (typeof (date1) === 'string')
-        return null;
+        throw new Error('date1 not is Date or string in ISO format');
     if (typeof (date2) === 'string' && isISODate(date2)) {
         date2 = new Date(date2);
     }
     else if (typeof (date2) === 'string')
-        return null;
+        throw new Error('date2 not is Date or string in ISO format');
     var values1 = [
         date1.getFullYear(),
         date1.getMonth(),
@@ -423,7 +490,7 @@ exports.dateEquals = dateEquals;
  *
  * @example
  * dateEqualsReverse(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
  *     toDate('2019/10/06 10:40'),
  *     toDate('2019/10/06 10:40')
  * ) // true
@@ -435,7 +502,7 @@ exports.dateEquals = dateEquals;
  *
  * // ignoring year, month and day
  * dateEqualsReverse(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
  *     toDate('2019/10/06 10:40'),
  *     toDate('2019/12/06 10:40'),
  *     4
@@ -443,7 +510,7 @@ exports.dateEquals = dateEquals;
  *
  * // ignoring year and month
  * dateEqualsReverse(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
  *     toDate('2019/10/06 10:40'),
  *     toDate('2019/12/06 10:40'),
  *     5
@@ -451,7 +518,7 @@ exports.dateEquals = dateEquals;
  *
  * // ignoring year
  * dateEqualsReverse(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
  *     toDate('2019/10/06 10:40'),
  *     toDate('2019/12/06 10:40'),
  *     6
@@ -459,20 +526,22 @@ exports.dateEquals = dateEquals;
  */
 function dateEqualsReverse(date1, date2, ignore) {
     if (ignore === void 0) { ignore = null; }
-    if (date1 === null || date1 === undefined)
-        throw new Error('date1 is null or undefined');
-    if (date2 === null || date2 === undefined)
-        throw new Error('date2 is null or undefined');
+    if (!(date1 instanceof Date) && typeof date1 !== 'string')
+        throw new Error('date1 not is Date or string');
+    if (!(date2 instanceof Date) && typeof date2 !== 'string')
+        throw new Error('date2 not is Date or string');
+    if (typeof ignore !== 'number' && ignore !== null && ignore !== undefined)
+        throw new Error('ignore not is number or null or undefined');
     if (typeof (date1) === 'string' && isISODate(date1)) {
         date1 = new Date(date1);
     }
     else if (typeof (date1) === 'string')
-        return null;
+        throw new Error('date1 not is Date or string in ISO format');
     if (typeof (date2) === 'string' && isISODate(date2)) {
         date2 = new Date(date2);
     }
     else if (typeof (date2) === 'string')
-        return null;
+        throw new Error('date2 not is Date or string in ISO format');
     var values1 = [
         date1.getFullYear(),
         date1.getMonth(),
@@ -515,32 +584,34 @@ exports.dateEqualsReverse = dateEqualsReverse;
  *
  * @example
  * getDateIgnore(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
  *     toDate('2019/06/10 10:30'),
  *     3
  * ) // Date only with year, month and day
  *
  * getDateIgnore(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
  *     toDate('2019/06/10 10:30'),
  *     4
  * ) // Date only with year, month, day and hour
  *
  * getDateIgnore(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
  *     toDate('2019/06/10 10:30'),
  *     7
  * ) // gets exactly the same date
  */
 function getDateIgnore(date, ignore) {
     if (ignore === void 0) { ignore = null; }
-    if (date === null || date === undefined)
-        return null;
+    if (!(date instanceof Date) && typeof date !== 'string')
+        throw new Error('date not is Date or string');
+    if (typeof ignore !== 'number' && ignore !== null && ignore !== undefined)
+        throw new Error('ignore not is number or null or undefined');
     if (typeof (date) === 'string' && isISODate(date)) {
         date = new Date(date);
     }
     else if (typeof (date) === 'string')
-        return null;
+        throw new Error('date not is Date or string in ISO format');
     var values = [
         date.getFullYear(),
         date.getMonth(),
@@ -567,32 +638,34 @@ exports.getDateIgnore = getDateIgnore;
  *
  * @example
  * getDateIgnoreReverse(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
  *     toDate('2019/06/10 10:30'),
  *     4
  * ) // Date only with hour, minute, second and millisecond
  *
  * getDateIgnoreReverse(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
  *     toDate('2019/06/10 10:30'),
  *     5
  * ) // Date only with day, hour, minute, second and millisecond
  *
  * getDateIgnoreReverse(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
  *     toDate('2019/06/10 10:30'),
  *     7
  * ) // gets exactly the same date
  */
 function getDateIgnoreReverse(date, ignore) {
     if (ignore === void 0) { ignore = null; }
-    if (date === null || date === undefined)
-        return null;
+    if (!(date instanceof Date) && typeof date !== 'string')
+        throw new Error('date not is Date or string');
+    if (typeof ignore !== 'number' && ignore !== null && ignore !== undefined)
+        throw new Error('ignore not is number or null or undefined');
     if (typeof (date) === 'string' && isISODate(date)) {
         date = new Date(date);
     }
     else if (typeof (date) === 'string')
-        return null;
+        throw new Error('date not is Date or string in ISO format');
     var values = [
         date.getFullYear(),
         date.getMonth(),
@@ -636,8 +709,11 @@ function formatTime(time) {
     for (var _i = 1; _i < arguments.length; _i++) {
         args[_i - 1] = arguments[_i];
     }
-    if (time === null || time === undefined)
-        return null;
+    if (typeof time !== 'number')
+        throw new Error('time not is number');
+    var invalidIndex = args.findIndex(function (a) { return typeof a !== 'number'; });
+    if (invalidIndex >= 0)
+        throw new Error("args[" + invalidIndex + "] not is number");
     var ret = [];
     for (var _a = 0, args_1 = args; _a < args_1.length; _a++) {
         var arg = args_1[_a];
@@ -693,24 +769,28 @@ exports.formatTime = formatTime;
 function dateInApointment(date, target, period, duration, marginErrorPeriod, marginErrorDuration) {
     if (marginErrorPeriod === void 0) { marginErrorPeriod = exports.PERIODS.MILLISECOND; }
     if (marginErrorDuration === void 0) { marginErrorDuration = 0; }
-    if (date === null || date === undefined)
-        throw new Error('date is null or undefined');
-    if (target === null || target === undefined)
-        throw new Error('target is null or undefined');
-    if (period === null || period === undefined)
-        throw new Error('period is null or undefined');
-    if (duration === null || duration === undefined)
-        throw new Error('duration is null or undefined');
-    if (typeof (date) === 'string' && isISODate(date)) {
+    if (!(date instanceof Date) && typeof date !== 'string')
+        throw new Error('date not is Date or string');
+    if (!(target instanceof Date) && typeof target !== 'string')
+        throw new Error('target not is Date or string');
+    if (typeof period !== 'string' && typeof period !== 'number')
+        throw new Error('period not is string or number');
+    if (typeof duration !== 'number')
+        throw new Error('date not is number');
+    if (typeof marginErrorPeriod !== 'string' && typeof marginErrorPeriod !== 'number')
+        throw new Error('marginErrorPeriod not is string or number');
+    if (typeof marginErrorDuration !== 'number')
+        throw new Error('marginErrorDuration not is number');
+    if (typeof date === 'string' && isISODate(date)) {
         date = new Date(date);
     }
-    else if (typeof (date) === 'string')
-        return null;
-    if (typeof (target) === 'string' && isISODate(target)) {
+    else if (typeof date === 'string')
+        throw new Error('date not is Date or string in ISO format');
+    if (typeof target === 'string' && isISODate(target)) {
         target = new Date(target);
     }
-    else if (typeof (target) === 'string')
-        return null;
+    else if (typeof target === 'string')
+        throw new Error('target not is Date or string in ISO format');
     var dateIt = date;
     var timeTarget = target.getTime();
     while (dateIt.getTime() <= target.getTime()) {
@@ -733,7 +813,7 @@ exports.dateInApointment = dateInApointment;
  * scape('ab.*+?^${c}()|d[]\\ef') // ab\.\*\+\?\^\$\{c\}\(\)\|d\[\]\\ef
  */
 function scape(str) {
-    if (str === null || str === undefined)
+    if (typeof str !== 'string')
         return null;
     return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }

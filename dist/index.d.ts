@@ -29,13 +29,19 @@ export declare const PERIODS: {
 /**
  * Returns a date based on a string with a given pattern
  * @param {string} str - String to convert to date
- * @param {string=} pattern - String containing date mask (default value 'yyyy/MM/dd hh:mm:ss.l')
+ * @param {string=} pattern - String containing date mask (default value 'yyyy/MM/dd hh:mm:ss.S')
  * @returns {Date} date based on a string with a given pattern
  *
  * @example
  * toDate('10/06/2019 21:13', 'dd/MM/yyyy hh:mm') // returns Date
  * toDate('10/6/2019 21:13', 'd/M/yyyy hh:mm') // returns Date
- * toDate('10/6/2019 21:13', 'dd/MM/yyyy hh:mm') // returns null, month invalid
+ * toDate('10/6/2019 21:13:49.5', 'd/M/yyyy hh:mm:ss.S') // returns Date
+ * toDate('10/6/2019 21:13:49.5', 'd/M/yyyy hh:mm:ss.SS') // returns null, invalid millisecond
+ * toDate('10/6/2019 21:13:49.59', 'd/M/yyyy hh:mm:ss.SS') // returns Date
+ * toDate('10/6/2019 21:13:49.593', 'd/M/yyyy hh:mm:ss.SS') // returns Date
+ * toDate('10/6/2019 21:13:49.593', 'd/M/yyyy hh:mm:ss.SSS') // returns Date
+ * toDate('10/6/2019 21:13:49.5', 'd/M/yyyy hh:mm:ss.SSS') // returns null, invalid millisecond
+ * toDate('10/6/2019 21:13', 'dd/MM/yyyy hh:mm') // returns null, invalid month
  */
 export declare function toDate(str: string, pattern?: string): Date;
 /**
@@ -56,6 +62,31 @@ export declare function toDate(str: string, pattern?: string): Date;
  * ) // 10/6/2019 21:13
  *
  * dateToStr(
+ *     toDate('10/6/2019 21:13', 'd/M/yyyy hh:mm'),
+ *     'd/M/yy hh:mm'
+ * ) // 10/6/19 21:13
+ *
+ * dateToStr(
+ *     toDate('10/6/2019 21:13:26.2', 'd/M/yyyy hh:mm:ss.S'),
+ *     'd/M/yyyy hh:mm:ss.SSS'
+ * ) // 10/6/2019 21:13:26.002
+ *
+ * dateToStr(
+ *     toDate('10/6/2019 21:13:26.2', 'd/M/yyyy hh:mm:ss.S'),
+ *     'd/M/yyyy hh:mm:ss.SS'
+ * ) // 10/6/2019 21:13:26.02
+ *
+ * dateToStr(
+ *     toDate('10/6/2019 21:13:26.2', 'd/M/yyyy hh:mm:ss.S'),
+ *     'd/M/yyyy hh:mm:ss.S'
+ * ) // 10/6/2019 21:13:26.2
+ *
+ * dateToStr(
+ *     toDate('10/6/2019 21:13:26.273', 'd/M/yyyy hh:mm:ss.S'),
+ *     'd/M/yyyy hh:mm:ss.SS'
+ * ) // 10/6/2019 21:13:26.27
+ *
+ * dateToStr(
  *     null,
  *     'dd/MM/yyyy hh:mm'
  * ) // null
@@ -68,8 +99,8 @@ export declare function dateToStr(date: Date | string, pattern?: string): string
  * @returns {string} minimum pattern  (strictly necessary) of a given formatted string representing a date
  *
  * @example
- * let date = toDate('10/06/2019 21:13', 'dd/MM/yyyy hh:mm:ss.l')
- * let minPattern = getMinPattern('10/06/2019 21:13', 'dd/MM/yyyy hh:mm:ss.l') // dd/MM/yyyy hh:mm
+ * let date = toDate('10/06/2019 21:13', 'dd/MM/yyyy hh:mm:ss.S')
+ * let minPattern = getMinPattern('10/06/2019 21:13', 'dd/MM/yyyy hh:mm:ss.S') // dd/MM/yyyy hh:mm
  * date = plus(date, PERIODS.YEAR, 1)
  * dateToStr(date, minPattern) // 10/06/2020 21:13
  *
@@ -80,7 +111,7 @@ export declare function dateToStr(date: Date | string, pattern?: string): string
  *
  * getMinPattern(
  *     null,
- *     'dd/MM/yyyy hh:mm:ss.l'
+ *     'dd/MM/yyyy hh:mm:ss.S'
  * ) // null
  */
 export declare function getMinPattern(strDate: string, pattern: string): string;
@@ -119,14 +150,14 @@ export declare function plus(date: Date | string, period: string | number, durat
  * ) // true
  *
  * dateEquals(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
  *     toDate('2019/06/10 10:30'),
  *     toDate('2019/06/10 02:13')
  * ) // false
  *
  * // ignoring millisecond, second, minute, hour and day
  * dateEquals(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
  *     toDate('2019/06/10 10:30'),
  *     toDate('2019/06/10 02:13'),
  *     2
@@ -134,7 +165,7 @@ export declare function plus(date: Date | string, period: string | number, durat
  *
  * // ignoring millisecond, second, minute and hour
  * dateEquals(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
  *     toDate('2019/06/10 10:30'),
  *     toDate('2019/06/10 02:13'),
  *     3
@@ -142,7 +173,7 @@ export declare function plus(date: Date | string, period: string | number, durat
  *
  * // ignoring millisecond, second and minute
  * dateEquals(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
  *     toDate('2019/06/10 10:30'),
  *     toDate('2019/06/10 02:13'),
  *     4
@@ -158,7 +189,7 @@ export declare function dateEquals(date1: Date | string, date2: Date | string, i
  *
  * @example
  * dateEqualsReverse(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
  *     toDate('2019/10/06 10:40'),
  *     toDate('2019/10/06 10:40')
  * ) // true
@@ -170,7 +201,7 @@ export declare function dateEquals(date1: Date | string, date2: Date | string, i
  *
  * // ignoring year, month and day
  * dateEqualsReverse(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
  *     toDate('2019/10/06 10:40'),
  *     toDate('2019/12/06 10:40'),
  *     4
@@ -178,7 +209,7 @@ export declare function dateEquals(date1: Date | string, date2: Date | string, i
  *
  * // ignoring year and month
  * dateEqualsReverse(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
  *     toDate('2019/10/06 10:40'),
  *     toDate('2019/12/06 10:40'),
  *     5
@@ -186,7 +217,7 @@ export declare function dateEquals(date1: Date | string, date2: Date | string, i
  *
  * // ignoring year
  * dateEqualsReverse(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
  *     toDate('2019/10/06 10:40'),
  *     toDate('2019/12/06 10:40'),
  *     6
@@ -201,19 +232,19 @@ export declare function dateEqualsReverse(date1: Date | string, date2: Date | st
  *
  * @example
  * getDateIgnore(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
  *     toDate('2019/06/10 10:30'),
  *     3
  * ) // Date only with year, month and day
  *
  * getDateIgnore(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
  *     toDate('2019/06/10 10:30'),
  *     4
  * ) // Date only with year, month, day and hour
  *
  * getDateIgnore(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
  *     toDate('2019/06/10 10:30'),
  *     7
  * ) // gets exactly the same date
@@ -227,19 +258,19 @@ export declare function getDateIgnore(date: Date | string, ignore?: number): Dat
  *
  * @example
  * getDateIgnoreReverse(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
  *     toDate('2019/06/10 10:30'),
  *     4
  * ) // Date only with hour, minute, second and millisecond
  *
  * getDateIgnoreReverse(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
  *     toDate('2019/06/10 10:30'),
  *     5
  * ) // Date only with day, hour, minute, second and millisecond
  *
  * getDateIgnoreReverse(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
  *     toDate('2019/06/10 10:30'),
  *     7
  * ) // gets exactly the same date

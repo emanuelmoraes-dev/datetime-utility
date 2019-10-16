@@ -13,8 +13,9 @@
  * console.log( isISODate( '2015-02-21T00Z' ) );           // false
  */
 export function isISODate(str: string): boolean {
-	const isoDateRegExp = new RegExp(/(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))/);
-	return isoDateRegExp.test(str);
+	if (typeof str !== 'string') return false
+	const isoDateRegExp = new RegExp(/(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))/)
+	return isoDateRegExp.test(str)
 }
 
 export const PERIODS = {
@@ -34,20 +35,27 @@ export const PERIODS = {
 /**
  * Returns a date based on a string with a given pattern
  * @param {string} str - String to convert to date
- * @param {string=} pattern - String containing date mask (default value 'yyyy/MM/dd hh:mm:ss.l')
+ * @param {string=} pattern - String containing date mask (default value 'yyyy/MM/dd hh:mm:ss.S')
  * @returns {Date} date based on a string with a given pattern
  * 
  * @example
  * toDate('10/06/2019 21:13', 'dd/MM/yyyy hh:mm') // returns Date
  * toDate('10/6/2019 21:13', 'd/M/yyyy hh:mm') // returns Date
- * toDate('10/6/2019 21:13', 'dd/MM/yyyy hh:mm') // returns null, month invalid
+ * toDate('10/6/2019 21:13:49.5', 'd/M/yyyy hh:mm:ss.S') // returns Date
+ * toDate('10/6/2019 21:13:49.5', 'd/M/yyyy hh:mm:ss.SS') // returns null, invalid millisecond
+ * toDate('10/6/2019 21:13:49.59', 'd/M/yyyy hh:mm:ss.SS') // returns Date
+ * toDate('10/6/2019 21:13:49.593', 'd/M/yyyy hh:mm:ss.SS') // returns Date
+ * toDate('10/6/2019 21:13:49.593', 'd/M/yyyy hh:mm:ss.SSS') // returns Date
+ * toDate('10/6/2019 21:13:49.5', 'd/M/yyyy hh:mm:ss.SSS') // returns null, invalid millisecond
+ * toDate('10/6/2019 21:13', 'dd/MM/yyyy hh:mm') // returns null, invalid month
  */
-export function toDate(str: string, pattern: string = 'yyyy/MM/dd hh:mm:ss.l'): Date {
-	if (str === null || str === undefined) return null
-	if (pattern === null || pattern === undefined) return null
+export function toDate(str: string, pattern: string = 'yyyy/MM/dd hh:mm:ss.S'): Date {
+	if (typeof str !== 'string') return null
+	if (typeof pattern !== 'string') return null
 	if (!str.trim()) return null
+	if (!pattern.trim()) return null
 
-	let expPattern = /yyyy|y|MM|M|dd|d|hh|h|mm|m|ss|s|l/g
+	let expPattern = /yyyy|y|MM|M|dd|d|hh|h|mm|m|ss|s|SSS|SS|S/g
 	let seps = pattern.split(expPattern)
 
 	let sepsScape = seps.filter(s => s).map(scape)
@@ -84,6 +92,8 @@ export function toDate(str: string, pattern: string = 'yyyy/MM/dd hh:mm:ss.l'): 
 		switch (m) {
 			case 'dd': {
 				if (value.length !== 2) return null
+				dateValues.day = v
+				break
 			}
 			case 'd': {
 				dateValues.day = v
@@ -91,6 +101,8 @@ export function toDate(str: string, pattern: string = 'yyyy/MM/dd hh:mm:ss.l'): 
 			}
 			case 'MM': {
 				if (value.length !== 2) return null
+				dateValues.month = v
+				break
 			}
 			case 'M': {
 				dateValues.month = v
@@ -98,6 +110,8 @@ export function toDate(str: string, pattern: string = 'yyyy/MM/dd hh:mm:ss.l'): 
 			}
 			case 'yyyy': {
 				if (value.length !== 4) return null
+				dateValues.year = v
+				break
 			}
 			case 'y': {
 				dateValues.year = v
@@ -105,6 +119,8 @@ export function toDate(str: string, pattern: string = 'yyyy/MM/dd hh:mm:ss.l'): 
 			}
 			case 'hh': {
 				if (value.length !== 2) return null
+				dateValues.hour = v
+				break
 			}
 			case 'h': {
 				dateValues.hour = v
@@ -112,6 +128,8 @@ export function toDate(str: string, pattern: string = 'yyyy/MM/dd hh:mm:ss.l'): 
 			}
 			case 'mm': {
 				if (value.length !== 2) return null
+				dateValues.minute = v
+				break
 			}
 			case 'm': {
 				dateValues.minute = v
@@ -119,12 +137,24 @@ export function toDate(str: string, pattern: string = 'yyyy/MM/dd hh:mm:ss.l'): 
 			}
 			case 'ss': {
 				if (value.length !== 2) return null
+				dateValues.second = v
+				break
 			}
 			case 's': {
 				dateValues.second = v
 				break
 			}
-			case 'l': {
+			case 'SSS': {
+				if (value.length !== 3) return null
+				dateValues.millisecond = v
+				break
+			}
+			case 'SS': {
+				if (value.length < 2 || value.length > 3) return null
+				dateValues.millisecond = v
+				break
+			}
+			case 'S': {
 				dateValues.millisecond = v
 				break
 			}
@@ -162,16 +192,42 @@ export function toDate(str: string, pattern: string = 'yyyy/MM/dd hh:mm:ss.l'): 
  * ) // 10/6/2019 21:13
  * 
  * dateToStr(
+ *     toDate('10/6/2019 21:13', 'd/M/yyyy hh:mm'),
+ *     'd/M/yy hh:mm'
+ * ) // 10/6/19 21:13
+ * 
+ * dateToStr(
+ *     toDate('10/6/2019 21:13:26.2', 'd/M/yyyy hh:mm:ss.S'),
+ *     'd/M/yyyy hh:mm:ss.SSS'
+ * ) // 10/6/2019 21:13:26.002
+ * 
+ * dateToStr(
+ *     toDate('10/6/2019 21:13:26.2', 'd/M/yyyy hh:mm:ss.S'),
+ *     'd/M/yyyy hh:mm:ss.SS'
+ * ) // 10/6/2019 21:13:26.02
+ * 
+ * dateToStr(
+ *     toDate('10/6/2019 21:13:26.2', 'd/M/yyyy hh:mm:ss.S'),
+ *     'd/M/yyyy hh:mm:ss.S'
+ * ) // 10/6/2019 21:13:26.2
+ * 
+ * dateToStr(
+ *     toDate('10/6/2019 21:13:26.273', 'd/M/yyyy hh:mm:ss.S'),
+ *     'd/M/yyyy hh:mm:ss.SS'
+ * ) // 10/6/2019 21:13:26.27
+ * 
+ * dateToStr(
  *     null,
  *     'dd/MM/yyyy hh:mm'
  * ) // null
  */
 export function dateToStr(date: Date | string, pattern: string = 'yyyy/MM/dd'): string {
-	if (date === null || date === undefined) return null
-	if (pattern === null || pattern === undefined) return null
+	if (!(date instanceof Date) && typeof date !== 'string') return null
+	if (typeof pattern !== 'string') return null
+	if (!pattern.trim()) return null
 
-	if (typeof (date) === 'string' && isISODate(date)) { date = new Date(date) }
-	else if (typeof (date) === 'string') return null
+	if (typeof date === 'string' && isISODate(date)) { date = new Date(date) }
+	else if (typeof date === 'string') return null
 
 	if (date instanceof Date) {
 		let day = `${date.getDate()}`
@@ -183,8 +239,8 @@ export function dateToStr(date: Date | string, pattern: string = 'yyyy/MM/dd'): 
 		let year = `${date.getFullYear()}`
 
 		let values = {
-			yyyy: year.length < 4 ? null : year,
-			yy: year.substring(2),
+			yyyy: year,
+			yy: year.substring(year.length - 2),
 			y: year,
 			MM: month.length === 1 ? `0${month}` : month,
 			M: month,
@@ -196,11 +252,13 @@ export function dateToStr(date: Date | string, pattern: string = 'yyyy/MM/dd'): 
 			m: minute,
 			ss: second.length === 1 ? `0${second}` : second,
 			s: second,
-			l: millisecond,
+			SSS: millisecond.length === 2 ? `0${millisecond}` : millisecond.length === 1 ? `00${millisecond}` : millisecond,
+			SS: millisecond.length === 3 ? `${millisecond[0]}${millisecond[1]}` : millisecond.length === 1 ? `0${millisecond}` : millisecond,
+			S: millisecond,
 			'': ''
 		}
 
-		let expPattern = /yyyy|yy|y|MM|M|dd|d|hh|h|mm|m|ss|s|l/g
+		let expPattern = /yyyy|yy|y|MM|M|dd|d|hh|h|mm|m|ss|s|SSS|SS|S/g
 		let seps = pattern.split(expPattern)
 
 		let sepsScape = seps.filter(s => s).map(scape)
@@ -226,8 +284,8 @@ export function dateToStr(date: Date | string, pattern: string = 'yyyy/MM/dd'): 
  * @returns {string} minimum pattern  (strictly necessary) of a given formatted string representing a date
  * 
  * @example
- * let date = toDate('10/06/2019 21:13', 'dd/MM/yyyy hh:mm:ss.l')
- * let minPattern = getMinPattern('10/06/2019 21:13', 'dd/MM/yyyy hh:mm:ss.l') // dd/MM/yyyy hh:mm
+ * let date = toDate('10/06/2019 21:13', 'dd/MM/yyyy hh:mm:ss.S')
+ * let minPattern = getMinPattern('10/06/2019 21:13', 'dd/MM/yyyy hh:mm:ss.S') // dd/MM/yyyy hh:mm
  * date = plus(date, PERIODS.YEAR, 1)
  * dateToStr(date, minPattern) // 10/06/2020 21:13
  * 
@@ -238,15 +296,16 @@ export function dateToStr(date: Date | string, pattern: string = 'yyyy/MM/dd'): 
  * 
  * getMinPattern(
  *     null,
- *     'dd/MM/yyyy hh:mm:ss.l'
+ *     'dd/MM/yyyy hh:mm:ss.S'
  * ) // null
  */
 export function getMinPattern(strDate: string, pattern: string): string {
-	if (strDate === null || strDate === undefined) return null
-	if (pattern === null || pattern === undefined) return null
+	if (typeof strDate !== 'string') return null
+	if (typeof pattern !== 'string') return null
 	if (!strDate.trim()) return null
+	if (!pattern.trim()) return null
 
-	let expPattern = /yyyy|y|MM|M|dd|d|hh|h|mm|m|ss|s|l/g
+	let expPattern = /yyyy|y|MM|M|dd|d|hh|h|mm|m|ss|s|SSS|SS|S/g
 	let seps = pattern.split(expPattern)
 
 	let sepsScape = seps.filter(s => s).map(scape)
@@ -283,12 +342,12 @@ export function getMinPattern(strDate: string, pattern: string): string {
  * ) // date with one year more
  */
 export function plus(date: Date | string, period: string | number, duration: number): Date {
-	if (date === null || date === undefined) return null
-	if (period === null || period === undefined) return null
-	if (duration === null || duration === undefined) return null
+	if (!(date instanceof Date) && typeof date !== 'string') return null
+	if (typeof period !== 'string' && typeof period !== 'number') return null
+	if (typeof duration !== 'number') return null
 
-	if (typeof (date) === 'string' && isISODate(date)) { date = new Date(date) }
-	else if (typeof (date) === 'string') return null
+	if (typeof date === 'string' && isISODate(date)) { date = new Date(date) }
+	else if (typeof date === 'string') return null
 
 	let [day, month, year, hour, minute, second, millisecond] = [
 		date.getDate(),
@@ -313,7 +372,7 @@ export function plus(date: Date | string, period: string | number, duration: num
 		case PERIODS.QUARTER: return new Date(year, month + duration * 3, day, hour, minute, second, millisecond)
 		case PERIODS.YEAR: return new Date(year + duration, month, day, hour, minute, second, millisecond)
 		default:
-			throw new Error(`Período ${period} inválido`)
+			throw new Error(`Invalid period ${period}`)
 	}
 }
 
@@ -331,14 +390,14 @@ export function plus(date: Date | string, period: string | number, duration: num
  * ) // true
  * 
  * dateEquals(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
  *     toDate('2019/06/10 10:30'),
  *     toDate('2019/06/10 02:13')
  * ) // false
  *
  * // ignoring millisecond, second, minute, hour and day
  * dateEquals(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
  *     toDate('2019/06/10 10:30'),
  *     toDate('2019/06/10 02:13'),
  *     2
@@ -346,7 +405,7 @@ export function plus(date: Date | string, period: string | number, duration: num
  * 
  * // ignoring millisecond, second, minute and hour
  * dateEquals(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
  *     toDate('2019/06/10 10:30'),
  *     toDate('2019/06/10 02:13'),
  *     3
@@ -354,21 +413,22 @@ export function plus(date: Date | string, period: string | number, duration: num
  * 
  * // ignoring millisecond, second and minute
  * dateEquals(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
  *     toDate('2019/06/10 10:30'),
  *     toDate('2019/06/10 02:13'),
  *     4
  * ) // false
  */
 export function dateEquals(date1: Date | string, date2: Date | string, ignore: number = null): boolean {
-	if (date1 === null || date1 === undefined) throw new Error('date1 is null or undefined')
-	if (date2 === null || date2 === undefined) throw new Error('date2 is null or undefined')
+	if (!(date1 instanceof Date) && typeof date1 !== 'string') throw new Error('date1 not is Date or string')
+	if (!(date2 instanceof Date) && typeof date2 !== 'string') throw new Error('date2 not is Date or string')
+	if (typeof ignore !== 'number' && ignore !== null && ignore !== undefined) throw new Error('ignore not is number or null or undefined')
 
 	if (typeof (date1) === 'string' && isISODate(date1)) { date1 = new Date(date1) }
-	else if (typeof (date1) === 'string') return null
+	else if (typeof (date1) === 'string') throw new Error('date1 not is Date or string in ISO format')
 
 	if (typeof (date2) === 'string' && isISODate(date2)) { date2 = new Date(date2) }
-	else if (typeof (date2) === 'string') return null
+	else if (typeof (date2) === 'string') throw new Error('date2 not is Date or string in ISO format')
 
 	let values1 = [
 		date1.getFullYear(),
@@ -407,7 +467,7 @@ export function dateEquals(date1: Date | string, date2: Date | string, ignore: n
  * 
  * @example
  * dateEqualsReverse(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
  *     toDate('2019/10/06 10:40'), 
  *     toDate('2019/10/06 10:40')
  * ) // true
@@ -419,7 +479,7 @@ export function dateEquals(date1: Date | string, date2: Date | string, ignore: n
  *
  * // ignoring year, month and day
  * dateEqualsReverse(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
  *     toDate('2019/10/06 10:40'),
  *     toDate('2019/12/06 10:40'),
  *     4
@@ -427,7 +487,7 @@ export function dateEquals(date1: Date | string, date2: Date | string, ignore: n
  * 
  * // ignoring year and month
  * dateEqualsReverse(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
  *     toDate('2019/10/06 10:40'),
  *     toDate('2019/12/06 10:40'),
  *     5
@@ -435,21 +495,22 @@ export function dateEquals(date1: Date | string, date2: Date | string, ignore: n
  *
  * // ignoring year
  * dateEqualsReverse(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
  *     toDate('2019/10/06 10:40'),
  *     toDate('2019/12/06 10:40'),
  *     6
  * ) // false
  */
 export function dateEqualsReverse(date1: Date | string, date2: Date | string, ignore: number = null): boolean {
-	if (date1 === null || date1 === undefined) throw new Error('date1 is null or undefined')
-	if (date2 === null || date2 === undefined) throw new Error('date2 is null or undefined')
+	if (!(date1 instanceof Date) && typeof date1 !== 'string') throw new Error('date1 not is Date or string')
+	if (!(date2 instanceof Date) && typeof date2 !== 'string') throw new Error('date2 not is Date or string')
+	if (typeof ignore !== 'number' && ignore !== null && ignore !== undefined) throw new Error('ignore not is number or null or undefined')
 
 	if (typeof (date1) === 'string' && isISODate(date1)) { date1 = new Date(date1) }
-	else if (typeof (date1) === 'string') return null
+	else if (typeof (date1) === 'string') throw new Error('date1 not is Date or string in ISO format')
 
 	if (typeof (date2) === 'string' && isISODate(date2)) { date2 = new Date(date2) }
-	else if (typeof (date2) === 'string') return null
+	else if (typeof (date2) === 'string') throw new Error('date2 not is Date or string in ISO format')
 
 	let values1 = [
 		date1.getFullYear(),
@@ -491,28 +552,29 @@ export function dateEqualsReverse(date1: Date | string, date2: Date | string, ig
  * 
  * @example
  * getDateIgnore(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
  *     toDate('2019/06/10 10:30'),
  *     3
  * ) // Date only with year, month and day
  * 
  * getDateIgnore(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
  *     toDate('2019/06/10 10:30'),
  *     4
  * ) // Date only with year, month, day and hour
  * 
  * getDateIgnore(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
  *     toDate('2019/06/10 10:30'),
  *     7
  * ) // gets exactly the same date
  */
 export function getDateIgnore(date: Date | string, ignore: number = null): Date {
-	if (date === null || date === undefined) return null
+	if (!(date instanceof Date) && typeof date !== 'string') throw new Error('date not is Date or string')
+	if (typeof ignore !== 'number' && ignore !== null && ignore !== undefined) throw new Error('ignore not is number or null or undefined')
 
 	if (typeof (date) === 'string' && isISODate(date)) { date = new Date(date) }
-	else if (typeof (date) === 'string') return null
+	else if (typeof (date) === 'string') throw new Error('date not is Date or string in ISO format')
 
 	let values = [
 		date.getFullYear(),
@@ -548,28 +610,29 @@ export function getDateIgnore(date: Date | string, ignore: number = null): Date 
  * 
  * @example
  * getDateIgnoreReverse(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
  *     toDate('2019/06/10 10:30'),
  *     4
  * ) // Date only with hour, minute, second and millisecond
  * 
  * getDateIgnoreReverse(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
  *     toDate('2019/06/10 10:30'),
  *     5
  * ) // Date only with day, hour, minute, second and millisecond
  * 
  * getDateIgnoreReverse(
- *     // default pattern: 'yyyy/MM/dd hh:mm:ss.l'
+ *     // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
  *     toDate('2019/06/10 10:30'),
  *     7
  * ) // gets exactly the same date
  */
 export function getDateIgnoreReverse(date: Date | string, ignore: number = null): Date {
-	if (date === null || date === undefined) return null
+	if (!(date instanceof Date) && typeof date !== 'string') throw new Error('date not is Date or string')
+	if (typeof ignore !== 'number' && ignore !== null && ignore !== undefined) throw new Error('ignore not is number or null or undefined')
 
 	if (typeof (date) === 'string' && isISODate(date)) { date = new Date(date) }
-	else if (typeof (date) === 'string') return null
+	else if (typeof (date) === 'string') throw new Error('date not is Date or string in ISO format')
 
 	let values = [
 		date.getFullYear(),
@@ -620,13 +683,16 @@ export function getDateIgnoreReverse(date: Date | string, ignore: number = null)
  * ) // [<amount of minutes in 200100 milliseconds>, <number of seconds remaining>]
  */
 export function formatTime(time: number, ...args: number[]): number[] {
-	if (time === null || time === undefined) return null
+	if (typeof time !== 'number') throw new Error('time not is number')
+	let invalidIndex = args.findIndex(a => typeof a !== 'number')
+	if (invalidIndex >= 0) throw new Error(`args[${invalidIndex}] not is number`)
 
 	let ret = []
 	for (let arg of args) {
 		ret.push(Math.floor(time / arg))
 		time = time % arg
 	}
+	
 	return ret
 }
 
@@ -681,16 +747,18 @@ export function dateInApointment(
 	marginErrorPeriod: string | number = PERIODS.MILLISECOND,
 	marginErrorDuration: number = 0
 ): boolean {
-	if (date === null || date === undefined) throw new Error('date is null or undefined')
-	if (target === null || target === undefined) throw new Error('target is null or undefined')
-	if (period === null || period === undefined) throw new Error('period is null or undefined')
-	if (duration === null || duration === undefined) throw new Error('duration is null or undefined')
+	if (!(date instanceof Date) && typeof date !== 'string') throw new Error('date not is Date or string')
+	if (!(target instanceof Date) && typeof target !== 'string') throw new Error('target not is Date or string')
+	if (typeof period !== 'string' && typeof period !== 'number') throw new Error('period not is string or number')
+	if (typeof duration !== 'number') throw new Error('date not is number')
+	if (typeof marginErrorPeriod !== 'string' && typeof marginErrorPeriod !== 'number') throw new Error('marginErrorPeriod not is string or number')
+	if (typeof marginErrorDuration !== 'number') throw new Error('marginErrorDuration not is number')
 
-	if (typeof (date) === 'string' && isISODate(date)) { date = new Date(date) }
-	else if (typeof (date) === 'string') return null
+	if (typeof date === 'string' && isISODate(date)) { date = new Date(date) }
+	else if (typeof date === 'string') throw new Error('date not is Date or string in ISO format')
 
-	if (typeof (target) === 'string' && isISODate(target)) { target = new Date(target) }
-	else if (typeof (target) === 'string') return null
+	if (typeof target === 'string' && isISODate(target)) { target = new Date(target) }
+	else if (typeof target === 'string') throw new Error('target not is Date or string in ISO format')
 
 	let dateIt = date
 	const timeTarget = target.getTime()
@@ -718,6 +786,6 @@ export function dateInApointment(
  * scape('ab.*+?^${c}()|d[]\\ef') // ab\.\*\+\?\^\$\{c\}\(\)\|d\[\]\\ef
  */
 export function scape(str: string): string {
-	if (str === null || str === undefined) return null
+	if (typeof str !== 'string') return null
 	return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
