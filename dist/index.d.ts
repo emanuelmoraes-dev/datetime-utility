@@ -30,6 +30,7 @@ export declare const PERIODS: {
  * Returns a date based on a string with a given pattern
  * @param {string} str - String to convert to date
  * @param {string=} pattern - String containing date mask (default value 'yyyy/MM/dd hh:mm:ss.S')
+ * @param {boolean=} strict - if true, if the amount of characters for a value in "default" is not respected, the function returns null. Default value: true
  * @returns {Date} date based on a string with a given pattern
  *
  * @example
@@ -37,13 +38,16 @@ export declare const PERIODS: {
  * toDate('10/6/2019 21:13', 'd/M/yyyy hh:mm') // returns Date
  * toDate('10/6/2019 21:13:49.5', 'd/M/yyyy hh:mm:ss.S') // returns Date
  * toDate('10/6/2019 21:13:49.5', 'd/M/yyyy hh:mm:ss.SS') // returns null, invalid millisecond
+ * toDate('10/6/2019 21:13:49.5', 'd/M/yyyy hh:mm:ss.SS', false) // returns Date
  * toDate('10/6/2019 21:13:49.59', 'd/M/yyyy hh:mm:ss.SS') // returns Date
  * toDate('10/6/2019 21:13:49.593', 'd/M/yyyy hh:mm:ss.SS') // returns Date
  * toDate('10/6/2019 21:13:49.593', 'd/M/yyyy hh:mm:ss.SSS') // returns Date
  * toDate('10/6/2019 21:13:49.5', 'd/M/yyyy hh:mm:ss.SSS') // returns null, invalid millisecond
+ * toDate('10/6/2019 21:13:49.5', 'd/M/yyyy hh:mm:ss.SSS', false) // returns Date
  * toDate('10/6/2019 21:13', 'dd/MM/yyyy hh:mm') // returns null, invalid month
+ * toDate('10/6/2019 21:13', 'dd/MM/yyyy hh:mm', false) // returns Date
  */
-export declare function toDate(str: string, pattern?: string): Date;
+export declare function toDate(str: string, pattern?: string, strict?: boolean): Date;
 /**
  * Converts a date to a string in the format described in the pattern
  * @param {Date|string} date - Date (or string in ISO format) to convert to string

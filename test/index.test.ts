@@ -115,6 +115,14 @@ describe("toDate", () => {
         )
     })
 
+    test("toDate('10/6/2019 21:13', 'dd/MM/yyyy hh:mm', false)", async () => {
+        expect(
+            toDate('10/6/2019 21:13', 'dd/MM/yyyy hh:mm', false).toISOString()
+        ).toBe(
+            new Date(2019, 5, 10, 21, 13).toISOString()
+        )
+    })
+
     test("toDate('10/6/2019 21:13:49.5', 'd/M/yyyy hh:mm:ss.S')", async () => {
         expect(
             toDate('10/6/2019 21:13:49.5', 'd/M/yyyy hh:mm:ss.S').toISOString()
@@ -128,6 +136,14 @@ describe("toDate", () => {
             toDate('10/6/2019 21:13:49.5', 'd/M/yyyy hh:mm:ss.SS')
         ).toBe(
             null
+        )
+    })
+
+    test("toDate('10/6/2019 21:13:49.5', 'd/M/yyyy hh:mm:ss.SS', false)", async () => {
+        expect(
+            toDate('10/6/2019 21:13:49.5', 'd/M/yyyy hh:mm:ss.SS', false).toISOString()
+        ).toBe(
+            new Date(2019, 5, 10, 21, 13, 49, 5).toISOString()
         )
     })
 
@@ -155,11 +171,19 @@ describe("toDate", () => {
         )
     })
 
-    test("toDate('10/6/2019 21:13', 'dd/MM/yyyy hh:mm')", async () => {
+    test("toDate('10/6/2019 21:13:49.5', 'd/M/yyyy hh:mm:ss.SSS')", async () => {
         expect(
             toDate('10/6/2019 21:13:49.5', 'd/M/yyyy hh:mm:ss.SSS')
         ).toBe(
             null
+        )
+    })
+
+    test("toDate('10/6/2019 21:13:49.5', 'd/M/yyyy hh:mm:ss.SSS', false)", async () => {
+        expect(
+            toDate('10/6/2019 21:13:49.5', 'd/M/yyyy hh:mm:ss.SSS', false).toISOString()
+        ).toBe(
+            new Date(2019, 5, 10, 21, 13, 49, 5).toISOString()
         )
     })
 })
@@ -481,7 +505,7 @@ describe("getDateIgnore", () => {
         )
     })
     
-    test("getDateIgnore(toDate('2019/06/10 10:30'), 3)", async () => {
+    test("getDateIgnore(toDate('2019/06/10 10:30'), 4)", async () => {
         expect(
             getDateIgnore(
                 // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
@@ -493,7 +517,7 @@ describe("getDateIgnore", () => {
         )
     })
     
-    test("getDateIgnore(toDate('2019/06/10 10:30'), 3)", async () => {
+    test("getDateIgnore(toDate('2019/06/10 10:30'), 7)", async () => {
         expect(
             getDateIgnore(
                 // default pattern: 'yyyy/MM/dd hh:mm:ss.S'
@@ -545,7 +569,7 @@ describe("getDateIgnoreReverse", () => {
 })
 
 describe("formatTime", () => {
-    test("formatTime(200000, PERIODS.MINUTE, PERIODS.SECOND)", async () => {
+    test("formatTime(200100, PERIODS.MINUTE, PERIODS.SECOND)", async () => {
         expect(
             formatTime(
                 200100,
@@ -572,7 +596,7 @@ describe("dateInApointment", () => {
         )
     })
     
-    test("dateInApointment(toDate('2000/01/02'), toDate('2025/07/02'), PERIODS.SEMESTER, 1)", async () => {
+    test("dateInApointment(toDate('2000/01/02'), toDate('2025/07/02'), PERIODS.SEMESTER, 2)", async () => {
         expect(
             dateInApointment(
                 toDate('2000/01/02'),

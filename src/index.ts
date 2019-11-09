@@ -36,6 +36,7 @@ export const PERIODS = {
  * Returns a date based on a string with a given pattern
  * @param {string} str - String to convert to date
  * @param {string=} pattern - String containing date mask (default value 'yyyy/MM/dd hh:mm:ss.S')
+ * @param {boolean=} strict - if true, if the amount of characters for a value in "default" is not respected, the function returns null. Default value: true
  * @returns {Date} date based on a string with a given pattern
  * 
  * @example
@@ -43,13 +44,16 @@ export const PERIODS = {
  * toDate('10/6/2019 21:13', 'd/M/yyyy hh:mm') // returns Date
  * toDate('10/6/2019 21:13:49.5', 'd/M/yyyy hh:mm:ss.S') // returns Date
  * toDate('10/6/2019 21:13:49.5', 'd/M/yyyy hh:mm:ss.SS') // returns null, invalid millisecond
+ * toDate('10/6/2019 21:13:49.5', 'd/M/yyyy hh:mm:ss.SS', false) // returns Date
  * toDate('10/6/2019 21:13:49.59', 'd/M/yyyy hh:mm:ss.SS') // returns Date
  * toDate('10/6/2019 21:13:49.593', 'd/M/yyyy hh:mm:ss.SS') // returns Date
  * toDate('10/6/2019 21:13:49.593', 'd/M/yyyy hh:mm:ss.SSS') // returns Date
  * toDate('10/6/2019 21:13:49.5', 'd/M/yyyy hh:mm:ss.SSS') // returns null, invalid millisecond
+ * toDate('10/6/2019 21:13:49.5', 'd/M/yyyy hh:mm:ss.SSS', false) // returns Date
  * toDate('10/6/2019 21:13', 'dd/MM/yyyy hh:mm') // returns null, invalid month
+ * toDate('10/6/2019 21:13', 'dd/MM/yyyy hh:mm', false) // returns Date
  */
-export function toDate(str: string, pattern: string = 'yyyy/MM/dd hh:mm:ss.S'): Date {
+export function toDate(str: string, pattern: string = 'yyyy/MM/dd hh:mm:ss.S', strict: boolean = true): Date {
 	if (typeof str !== 'string') return null
 	if (typeof pattern !== 'string') return null
 	if (!str.trim()) return null
@@ -91,7 +95,7 @@ export function toDate(str: string, pattern: string = 'yyyy/MM/dd hh:mm:ss.S'): 
 
 		switch (m) {
 			case 'dd': {
-				if (value.length !== 2) return null
+				if (strict && value.length !== 2) return null
 				dateValues.day = v
 				break
 			}
@@ -100,7 +104,7 @@ export function toDate(str: string, pattern: string = 'yyyy/MM/dd hh:mm:ss.S'): 
 				break
 			}
 			case 'MM': {
-				if (value.length !== 2) return null
+				if (strict && value.length !== 2) return null
 				dateValues.month = v
 				break
 			}
@@ -109,7 +113,7 @@ export function toDate(str: string, pattern: string = 'yyyy/MM/dd hh:mm:ss.S'): 
 				break
 			}
 			case 'yyyy': {
-				if (value.length !== 4) return null
+				if (strict && value.length !== 4) return null
 				dateValues.year = v
 				break
 			}
@@ -118,7 +122,7 @@ export function toDate(str: string, pattern: string = 'yyyy/MM/dd hh:mm:ss.S'): 
 				break
 			}
 			case 'hh': {
-				if (value.length !== 2) return null
+				if (strict && value.length !== 2) return null
 				dateValues.hour = v
 				break
 			}
@@ -127,7 +131,7 @@ export function toDate(str: string, pattern: string = 'yyyy/MM/dd hh:mm:ss.S'): 
 				break
 			}
 			case 'mm': {
-				if (value.length !== 2) return null
+				if (strict && value.length !== 2) return null
 				dateValues.minute = v
 				break
 			}
@@ -136,7 +140,7 @@ export function toDate(str: string, pattern: string = 'yyyy/MM/dd hh:mm:ss.S'): 
 				break
 			}
 			case 'ss': {
-				if (value.length !== 2) return null
+				if (strict && value.length !== 2) return null
 				dateValues.second = v
 				break
 			}
@@ -145,12 +149,12 @@ export function toDate(str: string, pattern: string = 'yyyy/MM/dd hh:mm:ss.S'): 
 				break
 			}
 			case 'SSS': {
-				if (value.length !== 3) return null
+				if (strict && value.length !== 3) return null
 				dateValues.millisecond = v
 				break
 			}
 			case 'SS': {
-				if (value.length < 2 || value.length > 3) return null
+				if (strict && (value.length < 2 || value.length > 3)) return null
 				dateValues.millisecond = v
 				break
 			}

@@ -45,6 +45,7 @@ exports.PERIODS = {
  * Returns a date based on a string with a given pattern
  * @param {string} str - String to convert to date
  * @param {string=} pattern - String containing date mask (default value 'yyyy/MM/dd hh:mm:ss.S')
+ * @param {boolean=} strict - if true, if the amount of characters for a value in "default" is not respected, the function returns null. Default value: true
  * @returns {Date} date based on a string with a given pattern
  *
  * @example
@@ -52,14 +53,18 @@ exports.PERIODS = {
  * toDate('10/6/2019 21:13', 'd/M/yyyy hh:mm') // returns Date
  * toDate('10/6/2019 21:13:49.5', 'd/M/yyyy hh:mm:ss.S') // returns Date
  * toDate('10/6/2019 21:13:49.5', 'd/M/yyyy hh:mm:ss.SS') // returns null, invalid millisecond
+ * toDate('10/6/2019 21:13:49.5', 'd/M/yyyy hh:mm:ss.SS', false) // returns Date
  * toDate('10/6/2019 21:13:49.59', 'd/M/yyyy hh:mm:ss.SS') // returns Date
  * toDate('10/6/2019 21:13:49.593', 'd/M/yyyy hh:mm:ss.SS') // returns Date
  * toDate('10/6/2019 21:13:49.593', 'd/M/yyyy hh:mm:ss.SSS') // returns Date
  * toDate('10/6/2019 21:13:49.5', 'd/M/yyyy hh:mm:ss.SSS') // returns null, invalid millisecond
+ * toDate('10/6/2019 21:13:49.5', 'd/M/yyyy hh:mm:ss.SSS', false) // returns Date
  * toDate('10/6/2019 21:13', 'dd/MM/yyyy hh:mm') // returns null, invalid month
+ * toDate('10/6/2019 21:13', 'dd/MM/yyyy hh:mm', false) // returns Date
  */
-function toDate(str, pattern) {
+function toDate(str, pattern, strict) {
     if (pattern === void 0) { pattern = 'yyyy/MM/dd hh:mm:ss.S'; }
+    if (strict === void 0) { strict = true; }
     if (typeof str !== 'string')
         return null;
     if (typeof pattern !== 'string')
@@ -96,7 +101,7 @@ function toDate(str, pattern) {
         }
         switch (m) {
             case 'dd': {
-                if (value.length !== 2)
+                if (strict && value.length !== 2)
                     return null;
                 dateValues.day = v;
                 break;
@@ -106,7 +111,7 @@ function toDate(str, pattern) {
                 break;
             }
             case 'MM': {
-                if (value.length !== 2)
+                if (strict && value.length !== 2)
                     return null;
                 dateValues.month = v;
                 break;
@@ -116,7 +121,7 @@ function toDate(str, pattern) {
                 break;
             }
             case 'yyyy': {
-                if (value.length !== 4)
+                if (strict && value.length !== 4)
                     return null;
                 dateValues.year = v;
                 break;
@@ -126,7 +131,7 @@ function toDate(str, pattern) {
                 break;
             }
             case 'hh': {
-                if (value.length !== 2)
+                if (strict && value.length !== 2)
                     return null;
                 dateValues.hour = v;
                 break;
@@ -136,7 +141,7 @@ function toDate(str, pattern) {
                 break;
             }
             case 'mm': {
-                if (value.length !== 2)
+                if (strict && value.length !== 2)
                     return null;
                 dateValues.minute = v;
                 break;
@@ -146,7 +151,7 @@ function toDate(str, pattern) {
                 break;
             }
             case 'ss': {
-                if (value.length !== 2)
+                if (strict && value.length !== 2)
                     return null;
                 dateValues.second = v;
                 break;
@@ -156,13 +161,13 @@ function toDate(str, pattern) {
                 break;
             }
             case 'SSS': {
-                if (value.length !== 3)
+                if (strict && value.length !== 3)
                     return null;
                 dateValues.millisecond = v;
                 break;
             }
             case 'SS': {
-                if (value.length < 2 || value.length > 3)
+                if (strict && (value.length < 2 || value.length > 3))
                     return null;
                 dateValues.millisecond = v;
                 break;

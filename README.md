@@ -52,6 +52,8 @@ Returns a date based on a string with a given pattern
 
 * pattern: String containing date mask (default value 'yyyy/MM/dd hh:mm:ss.S')
 
+* strict: if true, if the amount of characters for a value in "default" is not respected, the function returns null. Default value: true
+
 Pattern | Description
 ------- | ------------------------------------------
 dd      | day of the month containing two characters
@@ -78,11 +80,14 @@ toDate('10/06/2019 21:13', 'dd/MM/yyyy hh:mm') // returns Date
 toDate('10/6/2019 21:13', 'd/M/yyyy hh:mm') // returns Date
 toDate('10/6/2019 21:13:49.5', 'd/M/yyyy hh:mm:ss.S') // returns Date
 toDate('10/6/2019 21:13:49.5', 'd/M/yyyy hh:mm:ss.SS') // returns null, invalid millisecond
+toDate('10/6/2019 21:13:49.5', 'd/M/yyyy hh:mm:ss.SS', false) // returns Date
 toDate('10/6/2019 21:13:49.59', 'd/M/yyyy hh:mm:ss.SS') // returns Date
 toDate('10/6/2019 21:13:49.593', 'd/M/yyyy hh:mm:ss.SS') // returns Date
 toDate('10/6/2019 21:13:49.593', 'd/M/yyyy hh:mm:ss.SSS') // returns Date
 toDate('10/6/2019 21:13:49.5', 'd/M/yyyy hh:mm:ss.SSS') // returns null, invalid millisecond
+toDate('10/6/2019 21:13:49.5', 'd/M/yyyy hh:mm:ss.SSS', false) // returns Date
 toDate('10/6/2019 21:13', 'dd/MM/yyyy hh:mm') // returns null, invalid month
+toDate('10/6/2019 21:13', 'dd/MM/yyyy hh:mm', false) // returns Date
 ```
 
 ## dateToStr(date : Date|String, pattern : String)
