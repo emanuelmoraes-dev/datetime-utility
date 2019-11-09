@@ -30,7 +30,7 @@ export declare const PERIODS: {
  * Returns a date based on a string with a given pattern
  * @param {string} str - String to convert to date
  * @param {string=} pattern - String containing date mask (default value 'yyyy/MM/dd hh:mm:ss.S')
- * @param {boolean=} strict - if true, if the amount of characters for a value in "default" is not respected, the function returns null. Default value: true
+ * @param {boolean=} strict - if true, if the amount of characters for a value in "pattern" is not respected, the function returns null. Default value: true
  * @returns {Date} date based on a string with a given pattern
  *
  * @example

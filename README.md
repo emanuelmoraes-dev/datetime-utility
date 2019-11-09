@@ -52,7 +52,7 @@ Returns a date based on a string with a given pattern
 
 * pattern: String containing date mask (default value 'yyyy/MM/dd hh:mm:ss.S')
 
-* strict: if true, if the amount of characters for a value in "default" is not respected, the function returns null. Default value: true
+* strict: if true, if the amount of characters for a value in "pattern" is not respected, the function returns null. Default value: true
 
 Pattern | Description
 ------- | ------------------------------------------
