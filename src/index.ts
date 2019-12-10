@@ -791,5 +791,5 @@ export function dateInApointment(
  */
 export function scape(str: string): string {
 	if (typeof str !== 'string') return null
-	return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+	return str.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')
 }

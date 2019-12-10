@@ -820,6 +820,6 @@ exports.dateInApointment = dateInApointment;
 function scape(str) {
     if (typeof str !== 'string')
         return null;
-    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return str.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
 }
 exports.scape = scape;

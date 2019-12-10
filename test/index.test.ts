@@ -643,9 +643,9 @@ describe("dateInApointment", () => {
 describe("scape", () => {
     test("scape('ab.*+?^${c}()|d[]\\\\ef')", async () => {
         expect(
-            scape('ab.*+?^${c}()|d[]\\ef')
+            scape('ab.*+?^${c}()|d[]\\ef/')
         ).toBe(
-            'ab\\.\\*\\+\\?\\^\\$\\{c\\}\\(\\)\\|d\\[\\]\\\\ef'
+            'ab\\.\\*\\+\\?\\^\\$\\{c\\}\\(\\)\\|d\\[\\]\\\\ef\\/'
         )
     })
 })

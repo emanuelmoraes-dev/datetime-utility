@@ -42,7 +42,7 @@ console.log( isISODate( '2015-02-21T00:52' ) );         // false
 console.log( isISODate( '2015-02-21T00Z' ) );           // false
 ```
 
-## toDate(str : String, pattern : String)
+## toDate(str : String, pattern : String, strict: boolean)
 
 Returns a date based on a string with a given pattern
 
@@ -540,5 +540,5 @@ Returns string with special regular expression characters with escape
 ### example
 
 ```js
-scape('ab.*+?^${c}()|d[]\\ef') // ab\.\*\+\?\^\$\{c\}\(\)\|d\[\]\\ef
+scape('ab.*+?^${c}()|d[]\\ef/') // ab\.\*\+\?\^\$\{c\}\(\)\|d\[\]\\ef\/
 ```
